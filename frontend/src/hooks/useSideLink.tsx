@@ -1,0 +1,70 @@
+import { useUserContext } from '@/context/userContext'
+import {
+  IconBuildingWarehouse,
+  IconChecklist,
+  IconLayoutDashboard,
+  IconShoppingBag,
+  IconSitemapFilled
+} from '@tabler/icons-react'
+
+export interface INavLink {
+  title: string
+  label?: string
+  href: string
+  icon: JSX.Element
+}
+
+export interface ISideLink extends INavLink {
+  sub?: INavLink[]
+}
+
+export default function useSideLinks () {
+  const { selectedCenter } = useUserContext();
+  const centerSideLinks: ISideLink[] = [
+    {
+      title: 'Dashboard',
+      label: '',
+      href: '/dashboard',
+      icon: <IconLayoutDashboard size={18} />,
+    },
+    {
+      title: 'Service Requests',
+      label: '',
+      href: '/bookings',
+      icon: <IconShoppingBag size={18} />,
+    },
+    {
+      title: 'Service List',
+      label: '',
+      href: '/services',
+      icon: <IconChecklist size={18} />,
+    },
+  ]
+  const adminSideLinks: ISideLink[] = [
+    {
+      title: 'Dashboard',
+      label: '',
+      href: '/dashboard',
+      icon: <IconLayoutDashboard size={18} />,
+    },
+    {
+      title: 'Center List',
+      label: '',
+      href: '/center',
+      icon: <IconBuildingWarehouse size={18} />,
+    },
+    {
+      title: 'Team List',
+      label: '',
+      href: '/team',
+      icon: <IconSitemapFilled size={18} />,
+    },
+  ]
+
+  const sidelinks = selectedCenter !== null ? centerSideLinks : adminSideLinks
+
+  return {
+    sidelinks
+  }
+
+}
