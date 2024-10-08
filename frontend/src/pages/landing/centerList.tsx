@@ -1,13 +1,21 @@
 import { Button } from '@/components/custom/button'
 import { MultiSelect } from '@/components/custom/filter'
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select"
 import usePublicCenterList, { TFilterTypes } from '@/hooks/public/use-center-list'
-import { IconListDetails } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import Footer from './component/footer'
 import Header from './component/header'
 
+
 const PublicCenterList = () => {
-  const { centerList, filteredList, selectedValues, handleSelectionChange } = usePublicCenterList();
+  const { radiusCircle, defaultData, centerList, filteredList, selectedValues, handleSelectionChange, handleRadiusCircle } = usePublicCenterList();
 
 
   console.log(filteredList)
@@ -40,6 +48,12 @@ const PublicCenterList = () => {
                 handleSelectionChange(type, value)
               }}  
             />
+            <Select value={defaultData.radius} onValueChange={(e) => handleRadiusCircle(e)}>
+              <SelectTrigger className="w-auto"><SelectValue placeholder="Select Radius" /></SelectTrigger>
+              <SelectContent>
+                <SelectGroup>{radiusCircle?.map(item => <SelectItem value={item.value.toString()}>{item.label}</SelectItem>)}</SelectGroup>
+              </SelectContent>
+            </Select>
             {/* <MultiSelect 
               title='Service Type' 
               type={'service'} 

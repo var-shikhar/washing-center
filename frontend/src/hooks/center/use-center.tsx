@@ -1,5 +1,6 @@
 import { useUserContext } from '@/context/userContext';
 import useAxioRequests from '@/lib/axioRequest';
+import { TService } from '@/lib/commonTypes';
 import ROUTES from '@/lib/routes';
 import { startTransition, useEffect, useState } from 'react';
 
@@ -10,6 +11,7 @@ type TCenterList = {
     centerPhone: string;
     centerAddress: string;
     centerIsActive: boolean;
+    services: TService
 }
 
 const useCenter = () => {
@@ -22,7 +24,6 @@ const useCenter = () => {
         title: '',
         id: '',
     });
-
     
     const [selectedSort, setSelectedSort] = useState('ascending');
     const [searchTerm, setSearchTerm] = useState('');

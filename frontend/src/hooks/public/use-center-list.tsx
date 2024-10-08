@@ -2,8 +2,7 @@ import { toast } from '@/components/ui/use-toast';
 import useAxioRequests from '@/lib/axioRequest';
 import { TCenter, TService, TServiceCategory, TServiceItem, TServiceVehicle } from '@/lib/commonTypes';
 import ROUTES from '@/lib/routes';
-import { startTransition, useEffect, useLayoutEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
+import { startTransition, useEffect, useLayoutEffect, useState } from 'react';
 
 type TCenters = {
   centerID: string;
@@ -23,10 +22,37 @@ type TCenterListType = TCenter & {
 
 export type TFilterTypes = 'vehicleType' | 'category' | 'service';
 
+
+const radiusCircle = [
+  {
+    value: 1,
+    label: '1 Kms' 
+  },
+  {
+    value: 2,
+    label: '2 Kms' 
+  },
+  {
+    value: 5,
+    label: '5 Kms' 
+  },
+  {
+    value: 10,
+    label: '10 Kms' 
+  },
+  {
+    value: 20,
+    label: '20 Kms' 
+  },
+  {
+    value: 50,
+    label: '50 Kms' 
+  },
+]
+
 const usePublicCenterList = () => {
   const { HandleGetRequest } = useAxioRequests();
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
 
   const [centerList, setCenterList] = useState<TCenterListType>({} as TCenterListType);
   const [filteredList, setFilteredList] = useState<TCenters[]>([] as TCenters[]);
@@ -42,7 +68,7 @@ const usePublicCenterList = () => {
   const [defaultData, setDefaultData] = useState({
     lat: 0,
     long: 0,
-    radius: 5
+    radius: radiusCircle[0].value.toString()
   })
 
   useLayoutEffect(() => {
@@ -147,6 +173,7 @@ const usePublicCenterList = () => {
   }
 
 
+  // Handle Filter Togglers
   const handleSelectionChange = (type: TFilterTypes, value: string) => {
     setSelectedValues((prev) => {
       const updatedSet = new Set(prev[type]);
@@ -156,11 +183,22 @@ const usePublicCenterList = () => {
   };
   
 
+  // Handle Radius Circle
+  const handleRadiusCircle = (value: string) => {
+    startTransition(() => {
+      setLoading(true);
+      setDefaultData(prev => ({...prev, radius: value}));
+    })
+  }
+
   return {
+    radiusCircle,
     centerList,
     filteredList,
     selectedValues,
     handleSelectionChange,
+    defaultData, 
+    handleRadiusCircle
   }
 }
 

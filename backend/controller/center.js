@@ -315,12 +315,23 @@ const getPublicCenterList = async (req, res) => {
     const { lat, long, radius } = req.params;
     const parsedLat = parseFloat(lat);
     const parsedLong = parseFloat(long);
+    const parsedRadius = Number(radius)
+
+    console.log(parsedLat, parsedLong, parsedRadius)
+
     if (isNaN(long) || isNaN(lat)) {
         return res.status(400).send('Invalid longitude or latitude values');
     }
     try {
-        const foundCenters = (parsedLat === 0 || parsedLong === 0) ? await Center.find({isActive: true}).populate() : await Center.find({isActive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], radius / 6378.1] }}}).populate();   
-        const vehicleList = await Vehicle.find(); 
+        const foundCenters = (parsedLat === 0 || parsedLong === 0) ? 
+            (console.log('Called Inside this'), await Center.find({isActive: true}).populate()) : 
+            (console.log('Called Documented Route'), await Center.find({isActive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], parsedRadius / 6378.1] }}}).populate());   
+
+
+        const finalList = await Center.find({isActive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], parsedRadius / 6378.1] }}}).populate();
+        console.log(finalList);
+
+        const vehicleList = await Vehicle.find();  
         const categoryList = await ServiceCategory.find(); 
         const serviceList = await ServiceItem.find(); 
 
@@ -353,7 +364,7 @@ const getPublicCenterList = async (req, res) => {
                             vehicleID: service.serviceID?.vehicle,
                             addons: service.addons?.length > 0 
                                 ? service.addons.map(addItem => ({
-                                    addonName: addItem.addonID?.name,
+                                    serviceName: addItem.addonID?.name,
                                     price: addItem.price,
                                     discPrice: addItem.discPrice,
                                 }))
@@ -361,7 +372,7 @@ const getPublicCenterList = async (req, res) => {
                         }))
                     };
                     })
-            ) : [];
+            ) : []; 
 
         let finalData = {
             vehicleList: vehicleList?.length > 0 ? vehicleList.map(item => {return {id: item._id, name: item.name}}) : [],

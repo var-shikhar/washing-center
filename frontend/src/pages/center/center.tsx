@@ -35,6 +35,8 @@ export default function CenterPanel() {
     setModalData({id: id, title: title});
   }
 
+  // console.log(filteredList)
+
   return (
     <Layout fixed>
       {/* ===== Top Heading ===== */}
