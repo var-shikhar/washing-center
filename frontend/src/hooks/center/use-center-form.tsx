@@ -19,6 +19,7 @@ const useCenterForm = (formID = '') => {
     const { HandleGetRequest, HandlePostRequest } = useAxioRequests();
     const [loading, setLoading] = useState(formID !== '');
 
+
     const [currentPhase, setCurrentPhase] = useState(0);
     const [defaultValues, setDefaultValues] = useState<TDefaultValues>({
         id: formID,
@@ -84,7 +85,8 @@ const useCenterForm = (formID = '') => {
 
     return {
         defaultValues,
-        currentPhase, 
+        currentPhase,
+        loading, 
         setCurrentPhase,
         setDefaultValues,
         setLocationDetail,

@@ -30,6 +30,11 @@ const UserSchema = new mongoose.Schema({
         required: false,
         default: true
     },
+    isMember: {
+        type: Boolean,
+        required: false,
+        default: true
+    },
     isEmailVerified: {
         type: Boolean,
         required: false,
@@ -39,6 +44,12 @@ const UserSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+    userRole: {
+        type: String,
+        enum: ['Client', 'Admin'],
+        required: false,
+        default: 'Client'
+    }
 }, { timestamps: true });
 
 const User = mongoose.model('User', UserSchema);

@@ -17,6 +17,7 @@ export type TServiceItem = {
 
 export type TService = {
     id: string;
+    serviceID: string;
     serviceName: string;
     categoryID: string;
     categoryName: string;
@@ -27,6 +28,7 @@ export type TService = {
     isAvailable: boolean;
     isCustomizable: boolean;
     addons: {
+        serviceID: string;
         serviceName: string;
         price: number;
         discPrice: number;
@@ -37,5 +39,9 @@ export type TCenter = {
     centerID: string;
     centerName: string;
     centerAbbreviation: string;
-    centerAddress: string;    
+    centerAddress: string; 
+    centerGeoLocation?: {
+        lat: number,
+        long: number,
+    },   
 }

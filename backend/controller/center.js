@@ -317,19 +317,13 @@ const getPublicCenterList = async (req, res) => {
     const parsedLong = parseFloat(long);
     const parsedRadius = Number(radius)
 
-    console.log(parsedLat, parsedLong, parsedRadius)
-
     if (isNaN(long) || isNaN(lat)) {
         return res.status(400).send('Invalid longitude or latitude values');
     }
     try {
-        const foundCenters = (parsedLat === 0 || parsedLong === 0) ? 
-            (console.log('Called Inside this'), await Center.find({isActive: true}).populate()) : 
-            (console.log('Called Documented Route'), await Center.find({isActive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], parsedRadius / 6378.1] }}}).populate());   
-
-
-        const finalList = await Center.find({isActive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], parsedRadius / 6378.1] }}}).populate();
-        console.log(finalList);
+        const foundCenters = (parsedLat === 0 || parsedLong === 0 || parsedRadius === 0)
+            ? await Center.find({isActive: true}).populate() 
+            : await Center.find({isActive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], parsedRadius / 6378.1] }}}).populate();
 
         const vehicleList = await Vehicle.find();  
         const categoryList = await ServiceCategory.find(); 
@@ -354,8 +348,13 @@ const getPublicCenterList = async (req, res) => {
                         centerPhone: center.phone,
                         centerAddress: center.geoAddress,
                         centerAbbreviation: getNameAbbreviation(center.name),
+                        centerGeoLocation: {
+                            lat: center.coordinates.coordinates[1] ?? 0,
+                            long: center.coordinates.coordinates[0] ?? 0,
+                        },
                         services: services.map(service => ({
                             id: service._id,
+                            serviceID: service.serviceID._id,
                             serviceName: service.serviceID?.name,
                             price: service.price,
                             discPrice: service.discPrice,
@@ -364,6 +363,7 @@ const getPublicCenterList = async (req, res) => {
                             vehicleID: service.serviceID?.vehicle,
                             addons: service.addons?.length > 0 
                                 ? service.addons.map(addItem => ({
+                                    serviceID: addItem.addonID?._id,
                                     serviceName: addItem.addonID?.name,
                                     price: addItem.price,
                                     discPrice: addItem.discPrice,

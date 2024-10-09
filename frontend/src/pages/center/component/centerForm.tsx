@@ -1,5 +1,6 @@
 import { Button } from '@/components/custom/button'
 import GooglePlacesAutocomplete from '@/components/googleMap'
+import GoogleMapManualSelection from '@/components/interativeGoogleMap'
 import useCenterForm from '@/hooks/center/use-center-form'
 import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -32,7 +33,7 @@ const formSchema = z.object({
 });
 
 export default function CenterRegistrationForm({ className, formID, handleConfirmation, ...props }: TCenterFormProps) {
-  const { currentPhase, defaultValues, setCurrentPhase,  setLocationDetail, handleFormSubmission } = useCenterForm(formID);
+  const { currentPhase, defaultValues, loading, setCurrentPhase,  setLocationDetail, handleFormSubmission } = useCenterForm(formID);
   const { register, handleSubmit, reset, formState: { errors, isValid } } = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: defaultValues,
@@ -45,6 +46,10 @@ export default function CenterRegistrationForm({ className, formID, handleConfir
     }
   }, [defaultValues, reset]);
 
+  useEffect(() => {
+    console.log(defaultValues)
+  }, [defaultValues])
+
   async function onSubmit(data: z.infer<typeof formSchema>) {
     handleFormSubmission(data, handleConfirmation)
   }
@@ -53,7 +58,7 @@ export default function CenterRegistrationForm({ className, formID, handleConfir
     <div className={cn('grid gap-6', className)} {...props}>
       {currentPhase === 0 ? (
         <div>
-          <GooglePlacesAutocomplete locationDetail={defaultValues} setLocationDetail={setLocationDetail} showAddress={true} mapClass={'h-[300px]'} />
+          {!loading && <GoogleMapManualSelection locationDetail={defaultValues} setLocationDetail={setLocationDetail} showAddress={true} mapClass={'h-[300px]'} />}
           <Button className='mt-2 w-full' type='button' disabled={defaultValues.address === '' || defaultValues.geoLocation.lat === 0 || defaultValues.geoLocation.long === 0} onClick={() => setCurrentPhase(1)}>Next</Button>
         </div>
       ) : (

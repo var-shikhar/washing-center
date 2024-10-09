@@ -21,17 +21,14 @@ const Header = ({activeHeader}: THeaderProps) => {
         <nav className={`p-4 fixed w-full top-0 z-50 transition-all duration-300 ease-in-out ${sticky ? 'bg-opacity-20 backdrop-blur-md shadow-xl py-4' : 'py-6 bg-[--deep-purple] shadow-none'}`}>
             <div className="container mx-auto flex justify-between items-center">
                 <div className={`${sticky ? 'text-slate-900' : 'text-white'} text-xl font-bold`}>
-                    <a href="#" className="font-semibold text-3xl">Washing Center</a>
+                    <Link to={'/'}>
+                        <div className="font-semibold text-3xl">Washing Center</div>
+                    </Link>
                 </div>
                 <div className="hidden md:flex space-x-4">
                     <Link to={'../about'}>
                         <Button type="button" variant={'link'} className={`px-3 py-2 block my-auto text-lg rounded-md font-semibold font-sans ${activeHeader === 'About' ? 'text-white border-b-2 border-indigo-500' : sticky ? 'text-slate-500 hover:text-slate-900' : 'text-gray-400 hover:text-white'}`}>
                             About Us
-                        </Button>
-                    </Link>
-                    <Link to={'../center/list'}>
-                        <Button type="button" variant={'link'} className={`px-3 py-2 block my-auto text-lg rounded-md font-semibold font-sans ${activeHeader === 'Center' ? 'text-white border-b-2 border-indigo-500' : sticky ? 'text-slate-500 hover:text-slate-900' : 'text-gray-400 hover:text-white'}`}>
-                            Find Centers
                         </Button>
                     </Link>
                     <div className="hidden lg:flex items-center space-x-4">

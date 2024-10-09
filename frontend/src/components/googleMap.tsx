@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export type TLocationObj = {
     address: string;
@@ -10,7 +10,7 @@ export type TLocationObj = {
     }
 }
 
-type TGooglePlaceMapProps = {
+export type TGooglePlaceMapProps = {
     locationDetail: TLocationObj
     setLocationDetail: React.Dispatch<React.SetStateAction<TLocationObj>>
     showAddress: boolean;

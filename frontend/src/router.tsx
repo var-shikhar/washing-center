@@ -14,7 +14,13 @@ const publicRoutes = [
     }),
   },
   {
-    path: '/center/list',
+    path: '/about',
+    lazy: async () => ({
+      Component: (await import('./pages/landing/about.tsx')).default,
+    })
+  },
+  {
+    path: '/center/:id',
     lazy: async () => ({
       Component: (await import('./pages/landing/centerList.tsx')).default,
     }),

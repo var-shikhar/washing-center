@@ -4,16 +4,13 @@ import { TCenter, TService, TServiceCategory, TServiceItem, TServiceVehicle } fr
 import ROUTES from '@/lib/routes';
 import { startTransition, useEffect, useLayoutEffect, useState } from 'react';
 
-type TCenters = {
-  centerID: string;
-  centerName: string;
+type TCenters = TCenter & {
   centerPhone: number;
-  centerAddress: string;
-  centerAbbreviation: string;
   services: TService[]
 }
 
-type TCenterListType = TCenter & {
+
+type TCenterListType = {
   vehicleList: TServiceVehicle[],
   categoryList: TServiceCategory[],
   serviceList: TServiceItem[],
@@ -24,6 +21,10 @@ export type TFilterTypes = 'vehicleType' | 'category' | 'service';
 
 
 const radiusCircle = [
+  {
+    value: 0,
+    label: 'All Centers' 
+  },
   {
     value: 1,
     label: '1 Kms' 
@@ -132,8 +133,10 @@ const usePublicCenterList = () => {
   
   useEffect(() => {
     if(loading) handleGetQueryRequest(`${ROUTES.publicCenterListRoute}/${defaultData.lat}/${defaultData.long}/${defaultData.radius}`)
-  }, [loading, defaultData.lat, defaultData.long, defaultData.radius])
+  }, [loading])
 
+
+  // Filter the List using the Available Filters 
   useEffect(() => {
     if (centerList.centerList?.length > 0) {
       let tempList = centerList.centerList;
@@ -148,9 +151,14 @@ const usePublicCenterList = () => {
           const supportsCategory = selectedValues.category.size === 0 || 
             services.some(service => service && selectedValues.category.has(service?.categoryID));
 
-            const supportsService = selectedValues.service.size === 0 || 
-              services.some(service => service && selectedValues.service.has(service.id));
-                
+
+          const supportsService = selectedValues.service.size === 0 || 
+            services.some(service => service && (
+              selectedValues.service.has(service.serviceID) ||
+              (service.addons && service.addons.some(addon => selectedValues.service.has(addon.serviceID)))
+            )
+          );
+
           return supportsVehicle && supportsCategory && supportsService;
         });
       }
@@ -191,14 +199,29 @@ const usePublicCenterList = () => {
     })
   }
 
+
+  // Handle Navigation URL
+  const handleGMapURL = (lat: number, long: number) => {
+    const latitude = Number(lat); 
+    const longitude = Number(long);
+    const googleMapsURL = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
+    const googleMapsAppURL = `geo:${latitude},${longitude}`;
+
+
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    const finalURL = isMobile ? googleMapsAppURL : googleMapsURL;
+    window.location.href = finalURL
+  };
+
   return {
     radiusCircle,
     centerList,
     filteredList,
     selectedValues,
+    defaultData,
     handleSelectionChange,
-    defaultData, 
-    handleRadiusCircle
+    handleRadiusCircle,
+    handleGMapURL
   }
 }
 
