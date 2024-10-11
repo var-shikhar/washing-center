@@ -28,8 +28,6 @@ const ServiceSchema = new mongoose.Schema({
     },
     isCustomizable: {
         type: Boolean,
-        required: false,
-        default: false, // If true, addons can be added
     },
     addons: [{
         addonID: {

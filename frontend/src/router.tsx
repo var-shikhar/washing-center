@@ -22,7 +22,7 @@ const publicRoutes = [
   {
     path: '/center/:id',
     lazy: async () => ({
-      Component: (await import('./pages/landing/centerList.tsx')).default,
+      Component: (await import('./pages/landing/serviceList.tsx')).default,
     }),
   },
   {
@@ -92,7 +92,7 @@ const centerRoutes = [
       {
         path: 'bookings',
         lazy: async () => ({
-          Component: (await import('@/pages/tasks')).default,
+          Component: (await import('@/pages/booking/admin/adminBooking.tsx')).default,
         }),
       },
       {
@@ -152,7 +152,7 @@ const centerRoutes = [
     ],
   },
 ]
-const cetnerAdminRoutes = [
+const centerAdminRoutes = [
   {
     path: '/auth/otp',
     lazy: async () => ({
@@ -189,12 +189,48 @@ const cetnerAdminRoutes = [
     ],
   },
 ]
-
+const clientRoute = [
+  // Main routes
+  {
+    path: '/',
+    lazy: async () => ({
+      Component: (await import('@/pages/landing/landing.tsx')).default,
+    }),
+  },
+  {
+    path: 'center/:id',
+    lazy: async () => ({
+      Component: (await import('@/pages/landing/serviceList.tsx')).default,
+    }),
+  },
+  {
+    path: '/dashboard',
+    lazy: async () => {
+      const AppShell = await import('./components/app-shell')
+      return { Component: AppShell.default }
+    },
+    errorElement: <GeneralError />,
+    children: [
+      {
+        index: true,
+        lazy: async () => ({
+          Component: (await import('./pages/dashboard')).default,
+        }),
+      },
+      {
+        path: 'my-bookings',
+        lazy: async () => ({
+          Component: (await import('@/pages/landing/serviceList.tsx')).default,
+        }),
+      },
+    ],
+  },
+]
 export default function useRoutes() {
-  const { isLoggedIn, selectedCenter } = useUserContext();
+  const { isLoggedIn, selectedCenter, userData } = useUserContext();
 
   // Dynamically choose public or protected routes based on authentication
-  const userRoutes = isLoggedIn ? selectedCenter === null ? cetnerAdminRoutes : centerRoutes : publicRoutes;
+  const userRoutes = isLoggedIn ? userData?.userRole === 'Client' ? clientRoute : selectedCenter === null ? centerAdminRoutes : centerRoutes : publicRoutes;
 
   // Return the router object
   const routes =  createBrowserRouter([

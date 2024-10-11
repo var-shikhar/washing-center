@@ -46,10 +46,6 @@ export default function CenterRegistrationForm({ className, formID, handleConfir
     }
   }, [defaultValues, reset]);
 
-  useEffect(() => {
-    console.log(defaultValues)
-  }, [defaultValues])
-
   async function onSubmit(data: z.infer<typeof formSchema>) {
     handleFormSubmission(data, handleConfirmation)
   }

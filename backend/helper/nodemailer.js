@@ -61,7 +61,44 @@ async function handleResetPassword(name, email, url){
   );
 }
 
+// Login OTP
+function generateOTPLogin(email, otp) {
+  return `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="padding: 20px; border-radius: 10px; max-width: 600px; margin: auto; background-color: #f9f9f9;">
+        <h2 style="text-align: center; color: #4CAF50;">Your Login OTP</h2>
+        
+        <p>Hello,</p>
+        
+        <p>Your One-Time Password (OTP) for logging into your account (ID: ${email}) is:</p>
+        <p style="text-align: center; font-size: 24px; font-weight: bold; color: #4CAF50;">
+          ${otp}
+        </p>
+        
+        <p>This OTP is valid for the next 15 minutes.</p>
+        <p>If you did not request this, please ignore this email.</p>
+        <p>Best Regards,<br/>Washing Center Team</p>
+      </div>
+    </div>
+  `;
+}
+async function handleLoginOTP(email, otp) {
+  transporter.sendMail({
+      from: NODEMAILER_EMAIL,
+      to: email,
+      subject: `${otp} Your One-Time Password (OTP) for Account Login`,
+      html: generateOTPLogin(email, otp),
+    }, (error, info) => {
+      if (error) {
+        console.log('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    }
+  );
+}
 
+// Account Creation
 function generateAccountCreatedNotification(name, email, otp) {
   return `
     <div style="font-family: Arial, sans-serif; color: #333;">
@@ -138,7 +175,6 @@ function generateCenterCreatedNotification(userName, centerName, centerEmail) {
     </div>
   `;
 }
-
 async function handleCenterCreationNotification(centerName, userName, centerEmail) {
   transporter.sendMail({
       from: NODEMAILER_EMAIL,
@@ -156,10 +192,71 @@ async function handleCenterCreationNotification(centerName, userName, centerEmai
 }
 
 
+// Booking
+function generateBookingCreationEmail(centerName, name, email, phone, services, bookingDate, bookingTime, note) {
+  const serviceListHTML = services.map(service => `<li>${service}</li>`).join('');
+  return `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="background-color: #f7f7f7; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto;">
+        <h1 style="text-align: center; color: #4CAF50;">Booking Request Received</h1>
+        <p style="text-align: right; font-size: 14px; color: #777;">Date: ${new Date().toLocaleDateString('en-GB')}</p>
+        
+        <p>Dear <strong>${name}</strong>,</p>
+        
+        <p>We are pleased to inform you that we have received your booking request at <strong>${centerName}</strong>. Below are the services you've requested:</p>
+
+        <p><strong>Requested Services:</strong></p>
+        <ul style="list-style-type: none; padding-left: 0;">
+          ${serviceListHTML}
+        </ul>
+
+        ${note ? `<p><strong>Additional Note:</strong> ${note}</p>` : ''}
+
+        <p>We are currently reviewing your request and will confirm the availability of the requested time slot shortly.</p>
+
+        <p>Here are the details of your booking request:</p>
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li><strong>Full Name:</strong> ${name}</li>
+          <li><strong>Email Address:</strong> ${email}</li>
+          <li><strong>Phone Number:</strong> ${phone}</li>
+          <li><strong>Requested Booking Date:</strong> ${bookingDate}</li>
+          <li><strong>Requested Booking Time:</strong> ${bookingTime}</li>
+        </ul>
+
+        <p>If you have any questions or need further assistance, feel free to contact us. We appreciate your patience!</p>
+        
+        <p style="margin-top: 40px;">Kind Regards,</p>
+        <p><strong>${centerName} Team</strong></p>
+      </div>
+      
+      <p style="text-align: center; font-size: 12px; color: #999; margin-top: 20px;">
+        © ${new Date().getFullYear()} ${centerName}. All rights reserved.
+      </p>
+    </div>
+  `;
+}
+async function handleBookingCreation(centerName, name, userEmail, phone, services, bookingDate, bookingTime, note) {
+  transporter.sendMail({
+      from: NODEMAILER_EMAIL,
+      to: userEmail,
+      subject: `Booking Request for Car/Bike Washing Service at ${centerName}`,
+      html: generateBookingCreationEmail(centerName, name, userEmail, phone, services, bookingDate, bookingTime, note),
+    }, (error, info) => {
+      if (error) {
+        console.log('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    }
+  );
+}
+
+
 
 export default {
   handleAccountOTPValidation,
+  handleLoginOTP,
   handleResetPassword,
   handleCenterCreationNotification,
-  
+  handleBookingCreation,
 }

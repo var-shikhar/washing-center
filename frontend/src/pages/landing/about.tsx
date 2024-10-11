@@ -2,32 +2,8 @@ import { Button } from "@/components/custom/button";
 import { Link } from "react-router-dom";
 import Footer from "./component/footer";
 import Header from "./component/header";
-import { startTransition, useEffect, useState } from "react";
-import ROUTES from "@/lib/routes";
-import useAxioRequests from "@/lib/axioRequest";
-import { TCenter } from "@/lib/commonTypes";
-import { IconListDetails } from "@tabler/icons-react";
 
 const AboutPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [centerList, setCenterList] = useState<TCenter[]>([] as TCenter[])
-  const { HandleGetRequest } = useAxioRequests();
-
-  useEffect(() => {
-    loading && handleGetQueryRequest(ROUTES.publicCenterRoute)
-  })
-
-  // Handle Get Requests
-  async function handleGetQueryRequest(route: string){
-    const response = await HandleGetRequest({ route: route });
-    if(response?.status === 200){
-      startTransition(() => {
-        setCenterList(response.data);
-      })
-    }
-    setLoading(false);
-  }
-
   return (
     <>
       <Header activeHeader="Home" />

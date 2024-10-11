@@ -11,14 +11,14 @@ const { RouteCode } = CONSTANT;
 const { JWT_SECRET_KEY, SALT, FRONTEND_URL } = process.env;
 
 
-async function generateOTP(userID) {
+export async function generateOTP(userID) {
     let latestOTP = null;
     let isUnique = false;
+    try {
+        await OTP.deleteMany({ expiryTime: { $lt: Date.now() } });
 
-    while (!isUnique) {
-        latestOTP = Math.floor(100000 + Math.random() * 900000);
-
-        try {
+        while (!isUnique) {
+            latestOTP = Math.floor(100000 + Math.random() * 900000);
             const foundOTP = await OTP.findOne({ otp: latestOTP });
 
             if (!foundOTP) {
@@ -31,34 +31,41 @@ async function generateOTP(userID) {
                 await newOTP.save();
                 isUnique = true; // Mark as unique
             }
-        } catch (error) {
-            console.error("Error during OTP generation:", error);
-            throw new Error("Could not generate OTP. Please try again.");
         }
+    } catch (error) {
+        console.error("Error during OTP generation:", error);
+        throw new Error("Could not generate OTP. Please try again.");
     }
 
     return latestOTP.toString();
 }
-async function validateOTP(userID, userInputOTP) {
-    const foundOTP = await OTP.findOne({userID: userID});
-    if(foundOTP){
-        const { otp, expiryTime } = foundOTP;
-        if (Date.now() > expiryTime) {
-            await OTP.deleteOne({userID: userID}); // Remove expired OTP
-            return { isValid: false, statusCode: RouteCode.FORBIDDEN.statusCode, message: "OTP has expired." };
+export async function validateOTP(userID, userInputOTP) {
+    const foundOTPs = await OTP.find({ userID: userID });
+    
+    if (Array.isArray(foundOTPs) && foundOTPs.length > 0) {
+        for (const otpEntry of foundOTPs) {
+            const { otp, expiryTime } = otpEntry;
+            
+            // Check if OTP is expired
+            if (Date.now() > expiryTime) {
+                await OTP.deleteOne({ userID: userID, otp: otp }); // Remove expired OTP
+                return { isValid: false, statusCode: RouteCode.FORBIDDEN.statusCode, message: "OTP has expired." };
+            }
+            
+            // Check if OTP is valid
+            if (userInputOTP === otp) {
+                await OTP.deleteOne({ userID: userID, otp: otp }); // Remove validated OTP
+                return { isValid: true, statusCode: RouteCode.SUCCESS.statusCode, message: "OTP validated successfully." };
+            }
         }
-
-        if (userInputOTP === otp) {
-            await OTP.deleteOne({userID: userID}); // Remove Validated OTP
-            return { isValid: true, statusCode: RouteCode.SUCCESS.statusCode, message: "OTP validated successfully." };
-        } else {
-            return { isValid: false, statusCode: RouteCode.CONFLICT.statusCode, message: "Invalid OTP." };
-        }
-
+        
+        // If no valid OTP found after checking all entries
+        return { isValid: false, statusCode: RouteCode.CONFLICT.statusCode, message: "Invalid OTP." };
     } else {
         return { isValid: false, statusCode: RouteCode.NOT_FOUND.statusCode, message: "OTP not found. Try sending another one!" };
     }
 }
+
 const postRegister = async (req, res) => {
     const { name, email, phone, password, confirmPassword } = req.body;
     try {
@@ -83,7 +90,9 @@ const postRegister = async (req, res) => {
             email: email,
             phone: phone,
             password: hashedPassword,
+            userRole: "Admin",
             isAdmin: false,
+            isMember: false,
             isEmailVerified: false,
             isActive: false,
         })
@@ -242,6 +251,8 @@ const getUserContext = async (req, res) => {
             userName: user.name,
             userEmail: user.email,
             userPhone: user.phone,
+            userRole: user.userRole,
+            isMember: user.isMember,
             isActive: user.isActive,
             isEmailVerified: user.isEmailVerified,
             centerList: []

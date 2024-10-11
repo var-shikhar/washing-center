@@ -288,38 +288,98 @@ const getAuthCenterList = async (req, res) => {
 
 
 // Public Center Controllers
-const getPublicCenterFeatureList = async (req, res) => {
+const getCenterServices = async (req, res) => {
+    const { centerID } = req.params;
     try {
-        const foundCenters = await Center.find({ isActive: true }).limit(5); 
-        let centerList = [];
-
-        if(foundCenters){
-            centerList = foundCenters.map(center => {
-                return {
-                    centerID: center._id,
-                    centerName: center.name,
-                    centerPhone: center.phone,
-                    centerAddress: center.geoAddress,
-                    centerAbbreviation: getNameAbbreviation(center.name)
-                }
-            })
+        const foundCenter = await Center.findById(centerID)
+        if(!foundCenter){
+            res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'Center not found, Try again!'})
         }
-        return res.status(RouteCode.SUCCESS.statusCode).json(centerList);
+
+        const services = await Service.find({ centerID: foundCenter._id, isAvailable: true })
+            .populate({ path: 'serviceID', select: 'name description category vehicle',
+                populate: [{ path: 'category', select: 'name'}, { path: 'vehicle', select: 'name'}]
+            })
+            .populate({ path: 'addons.addonID', select: 'name description' })
+            .exec();
+
+        const serviceList = services?.map(item => {
+            return {
+                id: item._id,
+                serviceID: item.serviceID,
+                serviceName: item.serviceID.name,
+                serviceDescription: item.serviceID.description,
+                categoryID: item.serviceID.category._id,
+                categoryName: item.serviceID.category.name,
+                vehicleID: item.serviceID.vehicle._id,
+                vehicleName: item.serviceID.vehicle.name,
+                price: item.price,
+                discPrice: item.discPrice,
+                isAvailable: item.isAvailable,
+                isCustomizable: item.isCustomizable,
+                addons: item.addons?.map(addon => {
+                    return {
+                        serviceID: addon.addonID._id,
+                        serviceName: addon.addonID.name,
+                        serviceDescription: addon.addonID.description,
+                        price: addon.price,
+                        discPrice: addon.discPrice,
+                    }
+                })
+            }
+        });
+
+        const finalServiceList = serviceList?.map(item => {
+            let tempTotal = 0;
+            let tempDiscountedTotal = 0;
+        
+            item.addons?.forEach(subItem => {
+                tempTotal += subItem.price;
+                tempDiscountedTotal += subItem.discPrice;
+            });
+        
+            return {
+                ...item,
+                totalPrice: item.price + tempTotal,
+                totalDiscountedPrice: item.discPrice + tempDiscountedTotal,
+            };
+        }) || [];
+
+
+        const finalData = {
+            centerID: foundCenter._id,
+            centerName: foundCenter.name,
+            centerPhone: foundCenter.phone,
+            centerEmail: foundCenter.email,
+            centerTiming: {
+                stTime:  foundCenter.openingTiming.stTime,
+                edTime:  foundCenter.openingTiming.edTime,
+            },
+            centerAddress: foundCenter.geoAddress,
+            centerAbbreviation: getNameAbbreviation(foundCenter.name),
+            centerGeoLocation: {
+                lat: foundCenter.coordinates.coordinates[1] ?? 0,
+                long: foundCenter.coordinates.coordinates[0] ?? 0,
+            },
+            serviceList: finalServiceList
+        }
+
+        return res.status(RouteCode.SUCCESS.statusCode).json(finalData);
     } catch (err) {
         console.error(err);
         res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
     }
 }
-
 const getPublicCenterList = async (req, res) => {
     const { lat, long, radius } = req.params;
-    const parsedLat = parseFloat(lat);
-    const parsedLong = parseFloat(long);
+    const parsedLat = parseFloat(lat).toFixed(5);
+    const parsedLong = parseFloat(long).toFixed(5);
     const parsedRadius = Number(radius)
 
     if (isNaN(long) || isNaN(lat)) {
         return res.status(400).send('Invalid longitude or latitude values');
     }
+
     try {
         const foundCenters = (parsedLat === 0 || parsedLong === 0 || parsedRadius === 0)
             ? await Center.find({isActive: true}).populate() 
@@ -355,23 +415,15 @@ const getPublicCenterList = async (req, res) => {
                         services: services.map(service => ({
                             id: service._id,
                             serviceID: service.serviceID._id,
-                            serviceName: service.serviceID?.name,
-                            price: service.price,
-                            discPrice: service.discPrice,
-                            isCustomizable: service.isCustomizable,
                             categoryID: service.serviceID?.category,
                             vehicleID: service.serviceID?.vehicle,
                             addons: service.addons?.length > 0 
                                 ? service.addons.map(addItem => ({
                                     serviceID: addItem.addonID?._id,
-                                    serviceName: addItem.addonID?.name,
-                                    price: addItem.price,
-                                    discPrice: addItem.discPrice,
                                 }))
                                 : []
                         }))
-                    };
-                    })
+                    }})
             ) : []; 
 
         let finalData = {
@@ -394,5 +446,5 @@ export default {
 
 
     // Public Controller
-    getPublicCenterFeatureList, getPublicCenterList,
+    getPublicCenterList, getCenterServices
 }

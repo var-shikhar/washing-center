@@ -6,10 +6,31 @@ const BookingSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
-    service: {
+    userName: {
+        type: String,
+        required: true,
+    },
+    userPhone: {
+        type: String,
+        required: true,
+    },
+    centerID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Center',
+        required: true
+    },
+    serviceID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Service',
         required: true
+    },
+    servicePrice: {
+        type: Number,
+        required: true
+    },
+    isCustomizable: {
+        type: Boolean,
+        default: false
     },
     bookingDate: {
         type: Date,
@@ -32,6 +53,17 @@ const BookingSchema = new mongoose.Schema({
             required: true
         },
     }],
+    serviceAddons:  [{
+        addonID: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Service',
+            required: false
+        },
+        addonPrice: {
+            type: Number,
+            required: false
+        },
+    }],
     totalAmount: {
         type: Number,
         required: true
@@ -42,7 +74,7 @@ const BookingSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pending', 'Confirmed', 'Cancelled', 'Completed'],
+        enum: ['Pending', 'Confirmed', 'Rescheduled', 'Cancelled', 'Completed'],
         default: 'Pending',
         required: true
     },

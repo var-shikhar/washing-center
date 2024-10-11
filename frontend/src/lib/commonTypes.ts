@@ -15,31 +15,47 @@ export type TServiceItem = {
     vehicleID: string;
 }
 
-export type TService = {
+export type TServiceSkeleton = {
     id: string;
     serviceID: string;
-    serviceName: string;
     categoryID: string;
-    categoryName: string;
     vehicleID: string;
-    vehicleName: string;
-    price: number;
-    discPrice: number;
-    isAvailable: boolean;
-    isCustomizable: boolean;
+    addons: {
+        serviceID: string;
+    }[]   
+}
+
+export type TService = Omit<TServiceSkeleton, 'addons'> & {
     addons: {
         serviceID: string;
         serviceName: string;
+        serviceDescription?: string;
         price: number;
         discPrice: number;
-    }[]   
-}
+    }[];
+    serviceName: string;
+    serviceDescription?: string;
+    categoryName: string; 
+    vehicleName: string;
+    price: number;      
+    discPrice: number;  
+    isAvailable: boolean; 
+    isCustomizable: boolean;
+    totalPrice?: number;
+    totalDiscountedPrice?: number;
+};
 
 export type TCenter = {
     centerID: string;
     centerName: string;
     centerAbbreviation: string;
     centerAddress: string; 
+    centerPhone?: number;
+    centerEmail?: string;
+    centerTiming?: { 
+        stTime: string, 
+        edTime: string
+    },
     centerGeoLocation?: {
         lat: number,
         long: number,

@@ -1,10 +1,11 @@
 import express from "express";
 import authController from '../controller/auth.js';
 import centerController from '../controller/center.js';
+import serviceController from '../controller/service.js';
+import bookingController from '../controller/booking.js';
 
 
 import memberController from '../controller/member.js';
-import serviceController from '../controller/service.js';
 
 import { isAuth } from "../middleware/isAuthenticated.js";
 
@@ -25,8 +26,14 @@ router.route('/admin/service').post(isAuth, serviceController.postService).put(i
 router.route('/admin/service/:serviceID').get(isAuth, serviceController.getInitServiceForm).put(isAuth, serviceController.putServiceStatus).delete(isAuth, serviceController.deleteService);
 
 // Public Controller
-router.route('/public/center').get(centerController.getPublicCenterFeatureList);
 router.route('/public/center/list/:lat/:long/:radius').get(centerController.getPublicCenterList);
+router.route('/public/center/service/:centerID').get(centerController.getCenterServices);
+
+router.route('/public/auth/validateEmail').post(bookingController.postValidateEmail).put(isAuth, bookingController.putValidateOTP);
+router.route('/public/service/booking').post(isAuth, bookingController.postPublicServiceBooking);
+
+
+
 
 
 

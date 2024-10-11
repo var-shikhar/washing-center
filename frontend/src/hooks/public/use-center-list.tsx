@@ -1,12 +1,15 @@
 import { toast } from '@/components/ui/use-toast';
 import useAxioRequests from '@/lib/axioRequest';
-import { TCenter, TService, TServiceCategory, TServiceItem, TServiceVehicle } from '@/lib/commonTypes';
+import commonFn from '@/lib/commonFn';
+import { TCenter, TServiceCategory, TServiceItem, TServiceSkeleton, TServiceVehicle } from '@/lib/commonTypes';
 import ROUTES from '@/lib/routes';
 import { startTransition, useEffect, useLayoutEffect, useState } from 'react';
 
+const { handleGMapURL } = commonFn
+
 type TCenters = TCenter & {
   centerPhone: number;
-  services: TService[]
+  services: TServiceSkeleton[]
 }
 
 
@@ -138,7 +141,7 @@ const usePublicCenterList = () => {
 
   // Filter the List using the Available Filters 
   useEffect(() => {
-    if (centerList.centerList?.length > 0) {
+    if (Array.isArray(centerList.centerList)) {
       let tempList = centerList.centerList;
 
       if (selectedValues.vehicleType.size > 0 || selectedValues.category.size > 0 || selectedValues.service.size > 0) {
@@ -198,20 +201,6 @@ const usePublicCenterList = () => {
       setDefaultData(prev => ({...prev, radius: value}));
     })
   }
-
-
-  // Handle Navigation URL
-  const handleGMapURL = (lat: number, long: number) => {
-    const latitude = Number(lat); 
-    const longitude = Number(long);
-    const googleMapsURL = `https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`;
-    const googleMapsAppURL = `geo:${latitude},${longitude}`;
-
-
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    const finalURL = isMobile ? googleMapsAppURL : googleMapsURL;
-    window.location.href = finalURL
-  };
 
   return {
     radiusCircle,

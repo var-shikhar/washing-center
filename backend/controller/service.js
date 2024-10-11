@@ -193,7 +193,7 @@ const putServiceDetails = async (req, res) => {
             return res.status(RouteCode.BAD_REQUEST.statusCode).json({ message: 'Invalid price or discount price' });
         }
 
-        foundService.isCustomizable = isCustomizable ?? foundService.isCustomizable;
+        foundService.isCustomizable = isCustomizable;
         foundService.price = validPrice;
         foundService.discPrice = validDiscPrice;
 
@@ -212,7 +212,8 @@ const putServiceDetails = async (req, res) => {
             }).filter(Boolean);
         }
 
-        await foundService.save();
+
+        const result = await foundService.save();
         res.status(RouteCode.SUCCESS.statusCode).json({ message: 'Service details updated successfully' });
 
     } catch (err) {

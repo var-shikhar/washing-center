@@ -1,8 +1,8 @@
 import { Button } from "@/components/custom/button";
 import { Link } from "react-router-dom";
-import PublicCenterList from "./centerList";
-import Footer from "./component/footer";
 import Header from "./component/header";
+import PublicCenterList from "@/components/centerList";
+import Footer from "./component/footer";
 
 const LandingPage = () => {
   return (

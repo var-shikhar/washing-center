@@ -7,6 +7,8 @@ type TUserData = {
     userName: string;
     userEmail: string;
     userPhone: string;
+    userRole: string;
+    isMember: boolean;
     isActive: boolean;
     isEmailVerified: boolean;
     centerList: {

@@ -1,9 +1,5 @@
-import { HTMLAttributes, useState } from 'react'
-import { cn } from '@/lib/utils'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 import { Button } from '@/components/custom/button'
+import { PinInput, PinInputField } from '@/components/custom/pin-input'
 import {
   Form,
   FormControl,
@@ -12,20 +8,26 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { PinInput, PinInputField } from '@/components/custom/pin-input'
 import { Separator } from '@/components/ui/separator'
 import useAxioRequests from '@/lib/axioRequest'
-import ROUTES from '@/lib/routes'
-import { useNavigate } from 'react-router-dom'
+import { cn } from '@/lib/utils'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { HTMLAttributes, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
 
-interface OtpFormProps extends HTMLAttributes<HTMLDivElement> {}
+interface OTPFormProps extends HTMLAttributes<HTMLDivElement> {
+  submissionURL: string;
+  submissionType: 'put' | 'post';
+  successMessage: string;
+  successFn: (userID: string) => void;
+}
 
 const formSchema = z.object({
   otp: z.string().min(1, { message: 'Please enter your otp code.' }),
 })
 
-export function OtpForm({ className, ...props }: OtpFormProps) {
-  const navigate = useNavigate();
+export function OTPForm({ className, submissionURL, submissionType = 'put', successMessage = 'OTP has verified successfully!', successFn, ...props }: OTPFormProps) {
   const { HandlePostRequest } = useAxioRequests();
   const [isLoading, setIsLoading] = useState(false)
   const [disabledBtn, setDisabledBtn] = useState(true)
@@ -39,14 +41,12 @@ export function OtpForm({ className, ...props }: OtpFormProps) {
     setIsLoading(true)
     const response = await HandlePostRequest({
       data: data,
-      route: ROUTES.commonRegisterRoute, 
-      type: 'put', 
-      toastDescription: 'Account has activated successfully!',
+      route: submissionURL, 
+      type: submissionType, 
+      toastDescription: successMessage,
     })
     setIsLoading(false);
-    if(response?.status === 200){
-      navigate('../')
-    }
+    if(response?.status === 200) successFn(response.data)
   }
 
   return (

@@ -19,7 +19,7 @@ export interface ISideLink extends INavLink {
 }
 
 export default function useSideLinks () {
-  const { selectedCenter } = useUserContext();
+  const { selectedCenter, userData } = useUserContext();
   const centerSideLinks: ISideLink[] = [
     {
       title: 'Dashboard',
@@ -28,7 +28,7 @@ export default function useSideLinks () {
       icon: <IconLayoutDashboard size={18} />,
     },
     {
-      title: 'Service Requests',
+      title: 'Booking Requests',
       label: '',
       href: '/bookings',
       icon: <IconShoppingBag size={18} />,
@@ -61,7 +61,28 @@ export default function useSideLinks () {
     },
   ]
 
-  const sidelinks = selectedCenter !== null ? centerSideLinks : adminSideLinks
+  const clientSideLinks: ISideLink[] = [
+    {
+      title: 'Dashboard',
+      label: '',
+      href: '/dashboard',
+      icon: <IconLayoutDashboard size={18} />,
+    },
+    {
+      title: 'Bookings',
+      label: '',
+      href: '/dashboard/my-bookings',
+      icon: <IconBuildingWarehouse size={18} />,
+    },
+    {
+      title: 'Center List',
+      label: '',
+      href: '/',
+      icon: <IconLayoutDashboard size={18} />,
+    },
+  ]
+
+  const sidelinks = userData?.userRole === 'Client' ? clientSideLinks : selectedCenter !== null ? centerSideLinks : adminSideLinks
 
   return {
     sidelinks

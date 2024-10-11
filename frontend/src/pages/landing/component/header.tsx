@@ -3,10 +3,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 type THeaderProps = {
-    activeHeader: string
+    activeHeader: string;
+    wrapperClass?: string;
 }
 
-const Header = ({activeHeader}: THeaderProps) => {
+const Header = ({activeHeader, wrapperClass = ''}: THeaderProps) => {
     const [isOpen, setIsOpen] = useState(false);
     const [sticky, setSticky] = useState(false);
 
@@ -18,7 +19,7 @@ const Header = ({activeHeader}: THeaderProps) => {
     }, []);
 
     return (
-        <nav className={`p-4 fixed w-full top-0 z-50 transition-all duration-300 ease-in-out ${sticky ? 'bg-opacity-20 backdrop-blur-md shadow-xl py-4' : 'py-6 bg-[--deep-purple] shadow-none'}`}>
+        <nav className={`p-4 fixed w-full top-0 z-50 transition-all duration-300 ease-in-out ${sticky ? 'bg-opacity-20 backdrop-blur-md shadow-xl py-4' : 'py-6 bg-[--deep-purple] shadow-none'} ${wrapperClass}`}>
             <div className="container mx-auto flex justify-between items-center">
                 <div className={`${sticky ? 'text-slate-900' : 'text-white'} text-xl font-bold`}>
                     <Link to={'/'}>

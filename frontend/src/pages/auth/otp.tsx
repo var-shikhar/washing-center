@@ -2,20 +2,18 @@ import { Card } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import useAxioRequests from '@/lib/axioRequest';
 import ROUTES from '@/lib/routes';
-import { OtpForm } from './components/otp-form';
+import { OTPForm } from './components/otp-form';
+import { useNavigate } from 'react-router-dom';
 
 export default function Otp() {
   const { HandleGetRequest } = useAxioRequests();
+  const navigate = useNavigate();
+
   async function handleResendOTP() {
     const response = await HandleGetRequest({
       route: ROUTES.commonRegisterRoute
     })
-    if(response?.status === 200){
-      toast({
-        title: 'Success',
-        description: 'OTP has been reshared successfully!'
-    })
-    }
+    if(response?.status === 200) toast({title: 'Success', description: 'OTP has been reshared successfully!'})
   }
 
   return (
@@ -47,7 +45,7 @@ export default function Otp() {
                 authentication code to your email.
               </p>
             </div>
-            <OtpForm />
+            <OTPForm submissionURL={ROUTES.commonRegisterRoute} submissionType='put' successMessage='Account has activated successfully!' successFn={(userID: string) => navigate('../')} />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
               Haven't received it?{' '} &nbsp;
               <b
