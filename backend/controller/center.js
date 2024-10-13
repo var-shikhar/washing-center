@@ -7,6 +7,7 @@ import Vehicle from "../modal/vehicle.js";
 import ServiceCategory from "../modal/serviceCategory.js";
 import ServiceItem from "../modal/serviceItem.js";
 import Service from "../modal/service.js";
+import Booking from '../modal/booking.js';
 
 const { RouteCode } = CONSTANT;
 const { handleCenterCreationNotification } = MAILER;
@@ -288,6 +289,24 @@ const getAuthCenterList = async (req, res) => {
 
 
 // Public Center Controllers
+const getTodaysBookingCount = async (centerID) => {
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const todaysBookingCount = await Booking.countDocuments({
+        centerID: centerID,
+        bookingDate: {
+            $gte: startOfDay,
+            $lt: endOfDay
+        }
+    });
+
+    return todaysBookingCount;
+};
+
 const getCenterServices = async (req, res) => {
     const { centerID } = req.params;
     try {
@@ -361,6 +380,7 @@ const getCenterServices = async (req, res) => {
                 lat: foundCenter.coordinates.coordinates[1] ?? 0,
                 long: foundCenter.coordinates.coordinates[0] ?? 0,
             },
+            todaysCount: await getTodaysBookingCount(centerID),
             serviceList: finalServiceList
         }
 

@@ -15,7 +15,7 @@ const RoutesWrapper = () => {
 
   useLayoutEffect(() => {
     if (isLoggedIn) {
-      const authRoutes = ['/', '/center/list', '/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/auth/reset-password'];
+      const authRoutes = ['/auth/sign-in', '/auth/sign-up', '/auth/forgot-password', '/auth/reset-password'];
       if (authRoutes.includes(window.location.pathname)) {
         window.location.href = '/dashboard';
       }

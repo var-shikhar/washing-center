@@ -1,24 +1,26 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/custom/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuShortcut,
-  DropdownMenuTrigger,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import useAxioRequests from '@/lib/axioRequest'
-import { useNavigate } from 'react-router-dom'
-import ROUTES from '@/lib/routes'
 import { useUserContext } from '@/context/userContext'
+import useAxioRequests from '@/lib/axioRequest'
+import ROUTES from '@/lib/routes'
+import { useNavigate } from 'react-router-dom'
+import commonFn from '@/lib/commonFn'
+
+const { getNameAbbreviation } = commonFn
 
 export function UserNav() {
   const navigate = useNavigate();
   const { HandleGetRequest } = useAxioRequests();
-  const { handleLoggedOut } = useUserContext();
+  const { handleLoggedOut, userData } = useUserContext();
   async function handleLogout() {
     const response = await HandleGetRequest({
       route: ROUTES.getLogoutRoute, 
@@ -34,22 +36,22 @@ export function UserNav() {
       <DropdownMenuTrigger asChild>
         <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
           <Avatar className='h-8 w-8'>
-            <AvatarImage src='/avatars/01.png' alt='@shadcn' />
-            <AvatarFallback>SC</AvatarFallback>
+            <AvatarImage src='/avatars/01.png' alt='@washing-center' />
+            <AvatarFallback>{getNameAbbreviation(userData?.userName ?? 'User')}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-56' align='end' forceMount>
         <DropdownMenuLabel className='font-normal'>
           <div className='flex flex-col space-y-1'>
-            <p className='text-sm font-medium leading-none'>Sharma Car Washing Centre</p>
+            <p className='text-sm font-medium leading-none'>{userData?.userName}</p>
             <p className='text-xs leading-none text-muted-foreground'>
-              sharmacarwashing@gmail.com
+              {userData?.userEmail}
             </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuGroup>
+        {/* <DropdownMenuGroup>
           <DropdownMenuItem>
             Profile
             <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
@@ -58,8 +60,8 @@ export function UserNav() {
             Settings
             <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
           </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
+        </DropdownMenuGroup> 
+        <DropdownMenuSeparator />*/}
         <DropdownMenuItem onClick={handleLogout} className='cursor-pointer'>
           Log out
           <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>

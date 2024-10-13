@@ -70,7 +70,7 @@ const PublicServiceList = () => {
             </div>
         );
     };
-    
+
     return (
         <>
             <Header activeHeader='' wrapperClass='relative' />
@@ -141,7 +141,7 @@ const PublicServiceList = () => {
                                 </span>
                                 <address className=''>{centerData.centerAddress}</address>
                             </div>
-                            <small className='text-muted-foreground'>Current Count: <b>No. 50</b></small>
+                            <small className='text-muted-foreground'>Current Count: <b>No. {centerData?.todaysCount ?? 0}</b></small>
                         </div>
                         <hr className='my-4 border-[2px] sm:mx-2' />
                         <Input

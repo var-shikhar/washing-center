@@ -63,15 +63,9 @@ export default function useSideLinks () {
 
   const clientSideLinks: ISideLink[] = [
     {
-      title: 'Dashboard',
-      label: '',
-      href: '/dashboard',
-      icon: <IconLayoutDashboard size={18} />,
-    },
-    {
       title: 'Bookings',
       label: '',
-      href: '/dashboard/my-bookings',
+      href: '/dashboard',
       icon: <IconBuildingWarehouse size={18} />,
     },
     {

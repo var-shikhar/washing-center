@@ -5,7 +5,6 @@ import MaintenanceError from './pages/errors/maintenance-error'
 import NotFoundError from './pages/errors/not-found-error'
 import UnauthorisedError from './pages/errors/unauthorised-error.tsx'
 
-
 const publicRoutes = [
   {
     path: '/',
@@ -20,11 +19,25 @@ const publicRoutes = [
     })
   },
   {
+    path: '/track',
+    lazy: async () => ({
+      Component: (await import('./pages/landing/trackBooking.tsx')).default,
+    })
+  },
+  {
+    path: '/track/:id',
+    lazy: async () => ({
+      Component: (await import('./pages/landing/trackBooking.tsx')).default,
+    })
+  },
+  {
     path: '/center/:id',
     lazy: async () => ({
       Component: (await import('./pages/landing/serviceList.tsx')).default,
     }),
   },
+]
+const authRoutes = [
   {
     path: '/auth/sign-in',
     lazy: async () => ({
@@ -214,26 +227,22 @@ const clientRoute = [
       {
         index: true,
         lazy: async () => ({
-          Component: (await import('./pages/dashboard')).default,
-        }),
-      },
-      {
-        path: 'my-bookings',
-        lazy: async () => ({
-          Component: (await import('@/pages/landing/serviceList.tsx')).default,
+          Component: (await import('@/pages/booking/user/bookingPanel.tsx')).default,
         }),
       },
     ],
   },
 ]
 export default function useRoutes() {
-  const { isLoggedIn, selectedCenter, userData } = useUserContext();
+  const { selectedCenter, userData } = useUserContext();
 
   // Dynamically choose public or protected routes based on authentication
-  const userRoutes = isLoggedIn ? userData?.userRole === 'Client' ? clientRoute : selectedCenter === null ? centerAdminRoutes : centerRoutes : publicRoutes;
+  const userRoutes = userData?.userRole === 'Client' ? clientRoute : selectedCenter === null ? centerAdminRoutes : centerRoutes;
 
   // Return the router object
   const routes =  createBrowserRouter([
+    ...publicRoutes,
+    ...authRoutes,
     ...errorRoutes,
     ...userRoutes,
   ]);

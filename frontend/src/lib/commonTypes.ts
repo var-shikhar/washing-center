@@ -60,6 +60,7 @@ export type TCenter = {
         lat: number,
         long: number,
     },   
+    todaysCount?: number;
 }
 
 export type TBookingList = {

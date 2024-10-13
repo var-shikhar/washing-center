@@ -12,7 +12,7 @@ export default function ResetPassword() {
 
     useLayoutEffect(() => {
       if(isLoggedIn){
-        navigate('../')
+        navigate('../dashboard')
       }
     }, [isLoggedIn])
 

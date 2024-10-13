@@ -10,7 +10,7 @@ export default function SignUp() {
 
   useLayoutEffect(() => {
     if(isLoggedIn){
-      navigate('../')
+      navigate('../dashboard')
     }
   }, [isLoggedIn])
   

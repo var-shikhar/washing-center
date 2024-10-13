@@ -78,7 +78,6 @@ const putValidateOTP = async (req, res) => {
     }
 
 };
-
 // Booking Creation
 async function getServiceName(serviceID, type) {
     if(type === 'service'){
@@ -141,16 +140,119 @@ const postPublicServiceBooking = async (req, res) => {
         }
 
         serviceNameList = serviceNameList.filter(item => item !== false);
-        await handleBookingCreation(foundCenter.name, userName, foundUser.email, userPhone, serviceNameList, bookingDate, bookingTime, message) 
+        await handleBookingCreation(foundCenter.name, userName, foundUser.email, userPhone, serviceNameList, newBooking._id, bookingDate, bookingTime, message) 
         res.status(RouteCode.SUCCESS.statusCode).json(newBooking._id)        
     } catch(err){
         console.error(err);
         res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
     }
 }
+const getPublicBookingList = async (req, res) => {
+    const userID = req.user;
+    try {
+        const foundUser = await User.findById(userID);
+        if (!foundUser) {
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({ 
+                message: `Unauthorized access, Try later!` 
+            });
+        }
 
+        const foundBookings = await Booking.find({ user: userID })
+            .populate({
+                path: 'serviceID',
+                select: 'serviceID',
+                populate: {
+                    path: 'serviceID',
+                    model: 'ServiceItem',
+                    select: 'name'
+                }
+            })
+            .populate({
+                path: 'serviceAddons.addonID',
+                model: 'ServiceItem',
+                select: 'name'
+                })
+            .sort({ createdAt: -1 });
+    
+        const bookingList = (foundBookings || []).map(item => {
+            return {
+                id: item._id,
+                clientName: item.userName || 'Unknown',
+                clientNumber: item.userPhone || 'N/A',
+                appointmentDate: item.bookingDate || 'Not specified',
+                appointmentTime: item.bookingTime || 'Not specified',
+                totalAmount: item.totalAmount || 0,
+                message: item.message || '',
+                status: item.status || 'Pending',
+                serviceID: item.serviceID?.serviceID?._id,
+                serviceName: item.serviceID?.serviceID?.name || 'Unknown Service',
+                isRescheduled: item.isReschedules || false,
+                addonList: item.serviceAddons?.map(addon => {
+                    if (addon.addonID) { 
+                        return {
+                            addonID: addon.addonID._id,
+                            addonName: addon.addonID.name,
+                        };
+                    }
+                    return null;
+                }).filter(Boolean),
+            };
+        });
 
+        res.status(RouteCode.SUCCESS.statusCode).json(bookingList);
+    } catch (err) {
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message });
+    }
+};
+const getPublicBookingDetail = async (req, res) => {
+    const { bookingID } = req.params;
+    try {
+        const foundBooking = await Booking.findById(bookingID)
+            .populate({
+                path: 'serviceID',
+                select: 'serviceID',
+                populate: {
+                    path: 'serviceID',
+                    model: 'ServiceItem',
+                    select: 'name'
+                }
+            })
+            .populate({
+                path: 'serviceAddons.addonID',
+                model: 'ServiceItem',
+                select: 'name'
+            });
+    
+        const bookingDetail = {
+            id: foundBooking._id,
+            clientName: foundBooking.userName || 'Unknown',
+            clientNumber: foundBooking.userPhone || 'N/A',
+            appointmentDate: foundBooking.bookingDate || 'Not specified',
+            appointmentTime: foundBooking.bookingTime || 'Not specified',
+            totalAmount: foundBooking.totalAmount || 0,
+            message: foundBooking.message || '',
+            status: foundBooking.status || 'Pending',
+            serviceID: foundBooking.serviceID?.serviceID?._id,
+            serviceName: foundBooking.serviceID?.serviceID?.name || 'Unknown Service',
+            isRescheduled: foundBooking.isReschedules || false,
+            addonList: foundBooking.serviceAddons?.map(addon => {
+                if (addon.addonID) { 
+                    return {
+                        addonID: addon.addonID._id,
+                        addonName: addon.addonID.name,
+                    };
+                }
+                return null;
+            }).filter(Boolean),
+        };
 
+        res.status(RouteCode.SUCCESS.statusCode).json(bookingDetail);
+    } catch (err) {
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message });
+    }
+}
 
 // Admin Booking Controller
 const getBookingAPIData = async (req, res) => {
@@ -245,7 +347,7 @@ const putRescheduleBooking = async (req, res) => {
         })
 
         await foundBooking.save();
-        await handleBookingReschedule(foundBooking.centerID.name, foundBooking.userName, foundUser.email, newDate, newTime); 
+        await handleBookingReschedule(foundBooking.centerID.name, foundBooking.userName, foundUser.email, newDate, newTime, foundBooking._id); 
         res.status(RouteCode.SUCCESS.statusCode).json({message: 'Booking has rescheduled successfully!'})        
     } catch(err){
         console.error(err);
@@ -265,7 +367,7 @@ const putBookingStatusUpdate = async (req, res) => {
         foundBooking.status = statusID || 'Pending';
         await foundBooking.save();
 
-        await handleBookingStatusUpdate(foundBooking.centerID.name, foundBooking.userName, foundUser.email, statusID); 
+        await handleBookingStatusUpdate(foundBooking.centerID.name, foundBooking.userName, foundUser.email, statusID, foundBooking._id); 
         res.status(RouteCode.SUCCESS.statusCode).json({message: 'Booking Status has updated successfully!'})        
     } catch(err){
         console.error(err);
@@ -402,7 +504,7 @@ const postAdminServiceBooking = async (req, res) => {
         }
 
         serviceNameList = serviceNameList.filter(item => item !== false);
-        await handleBookingCreation(foundCenter.name, userName, foundUser.email, userPhone, serviceNameList, bookingDate, bookingTime, message) 
+        await handleBookingCreation(foundCenter.name, userName, foundUser.email, userPhone, serviceNameList, newBooking._id, bookingDate, bookingTime, message) 
         res.status(RouteCode.SUCCESS.statusCode).json(newBooking._id)        
     } catch(err){
         console.error(err);
@@ -413,13 +515,9 @@ const postAdminServiceBooking = async (req, res) => {
 
 
 
-
-
-
-
 export default {
     postValidateEmail, putValidateOTP,
-    postPublicServiceBooking,
+    postPublicServiceBooking, getPublicBookingList, getPublicBookingDetail,
 
     // Admin Booking
     getBookingAPIData, getBookingList, putRescheduleBooking, putBookingStatusUpdate,

@@ -10,7 +10,7 @@ export default function ForgotPassword() {
 
   useLayoutEffect(() => {
     if(isLoggedIn){
-      navigate('../')
+      navigate('../dashboard')
     }
   }, [isLoggedIn])
 

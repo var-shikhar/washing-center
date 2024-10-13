@@ -193,7 +193,7 @@ async function handleCenterCreationNotification(centerName, userName, centerEmai
 
 
 // Booking
-function generateBookingCreationEmail(centerName, name, email, phone, services, bookingDate, bookingTime, note) {
+function generateBookingCreationEmail(centerName, name, email, phone, services, bookingID, bookingDate, bookingTime, note) {
   const serviceListHTML = services.map(service => `<li>${service}</li>`).join('');
   return `
     <div style="font-family: Arial, sans-serif; color: #333;">
@@ -216,12 +216,20 @@ function generateBookingCreationEmail(centerName, name, email, phone, services, 
 
         <p>Here are the details of your booking request:</p>
         <ul style="list-style-type: none; padding-left: 0;">
+          <li><strong>Booking ID:</strong> ${bookingID}</li>
           <li><strong>Full Name:</strong> ${name}</li>
           <li><strong>Email Address:</strong> ${email}</li>
           <li><strong>Phone Number:</strong> ${phone}</li>
           <li><strong>Requested Booking Date:</strong> ${bookingDate}</li>
           <li><strong>Requested Booking Time:</strong> ${bookingTime}</li>
         </ul>
+
+        <p style="text-align: center; margin-top: 20px;">
+          <a href='${FRONTEND_URL}/track/${bookingID}' 
+             style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+            Track Booking Status
+          </a>
+        </p>
 
         <p>If you have any questions or need further assistance, feel free to contact us. We appreciate your patience!</p>
         
@@ -235,12 +243,12 @@ function generateBookingCreationEmail(centerName, name, email, phone, services, 
     </div>
   `;
 }
-async function handleBookingCreation(centerName, name, userEmail, phone, services, bookingDate, bookingTime, note) {
+async function handleBookingCreation(centerName, name, userEmail, phone, services, bookingID, bookingDate, bookingTime, note) {
   transporter.sendMail({
       from: NODEMAILER_EMAIL,
       to: userEmail,
       subject: `Booking Request for Car/Bike Washing Service at ${centerName}`,
-      html: generateBookingCreationEmail(centerName, name, userEmail, phone, services, bookingDate, bookingTime, note),
+      html: generateBookingCreationEmail(centerName, name, userEmail, phone, services, bookingID, bookingDate, bookingTime, note),
     }, (error, info) => {
       if (error) {
         console.log('Error sending email:', error);
@@ -251,7 +259,7 @@ async function handleBookingCreation(centerName, name, userEmail, phone, service
   );
 }
 // Rescheduling Email
-function generateBookingRescheduleEmail(centerName, name, newBookingDate, newBookingTime) {
+function generateBookingRescheduleEmail(centerName, name, newBookingDate, newBookingTime, bookingID) {
   return `
     <div style="font-family: Arial, sans-serif; color: #333;">
       <div style="background-color: #f7f7f7; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto;">
@@ -267,6 +275,13 @@ function generateBookingRescheduleEmail(centerName, name, newBookingDate, newBoo
           <li><strong>New Booking Time:</strong> ${newBookingTime}</li>
         </ul>
 
+        <p style="text-align: center; margin-top: 20px;">
+          <a href='${FRONTEND_URL}/track/${bookingID}' 
+             style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+            Track Booking Status
+          </a>
+        </p>
+
         <p>If you have any questions or require further assistance, please don't hesitate to contact us. Thank you for your understanding and continued support.</p>
         
         <p style="margin-top: 40px;">Kind Regards,</p>
@@ -279,19 +294,19 @@ function generateBookingRescheduleEmail(centerName, name, newBookingDate, newBoo
     </div>
   `;
 }
-async function handleBookingReschedule(centerName, name, userEmail, newBookingDate, newBookingTime) {
+async function handleBookingReschedule(centerName, name, userEmail, newBookingDate, newBookingTime, bookingID) {
   transporter.sendMail({
       from: NODEMAILER_EMAIL,
       to: userEmail,
       subject: `Your Booking at ${centerName} has been rescheduled`,
-      html: generateBookingRescheduleEmail(centerName, name, newBookingDate, newBookingTime),
+      html: generateBookingRescheduleEmail(centerName, name, newBookingDate, newBookingTime, bookingID),
     }, (error, info) => {
       error ? console.log('Error sending email:', error) : console.log('Email sent:', info.response);
     }
   );
 }
 // Booking Status Update
-function generateBookingStatusUpdateEmail(centerName, name, status) {
+function generateBookingStatusUpdateEmail(centerName, name, status, bookingID) {
   const statusMessage = {
     pending: 'Your booking is currently pending.',
     confirmed: 'Your booking has been confirmed.',
@@ -321,6 +336,13 @@ function generateBookingStatusUpdateEmail(centerName, name, status) {
 
         ${reviewRequestHTML}
 
+        <p style="text-align: center; margin-top: 20px;">
+          <a href='${FRONTEND_URL}/track/${bookingID}' 
+             style="display: inline-block; background-color: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; font-weight: bold;">
+            Track Booking Status
+          </a>
+        </p>
+
         <p>If you have any questions or need further assistance, feel free to reach out to us.</p>
         
         <p style="margin-top: 40px;">Kind Regards,</p>
@@ -333,12 +355,12 @@ function generateBookingStatusUpdateEmail(centerName, name, status) {
     </div>
   `;
 }
-async function handleBookingStatusUpdate(centerName, name, userEmail, status) {
+async function handleBookingStatusUpdate(centerName, name, userEmail, status, bookingID) {
   transporter.sendMail({
       from: NODEMAILER_EMAIL,
       to: userEmail,
       subject: `Booking Status Update: ${status.charAt(0).toUpperCase() + status.slice(1)} at ${centerName}`,
-      html: generateBookingStatusUpdateEmail(centerName, name, status),
+      html: generateBookingStatusUpdateEmail(centerName, name, status, bookingID),
     }, (error, info) => {
       if (error) {
         console.log('Error sending email:', error);

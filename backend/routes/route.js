@@ -37,8 +37,8 @@ router.route('/public/center/list/:lat/:long/:radius').get(centerController.getP
 router.route('/public/center/service/:centerID').get(centerController.getCenterServices);
 
 router.route('/public/auth/validateEmail').post(bookingController.postValidateEmail).put(isAuth, bookingController.putValidateOTP);
-router.route('/public/service/booking').post(isAuth, bookingController.postPublicServiceBooking);
-
+router.route('/public/service/booking').get(isAuth, bookingController.getPublicBookingList).post(isAuth, bookingController.postPublicServiceBooking);
+router.route('/public/service/booking/:bookingID').get(bookingController.getPublicBookingDetail)
 
 
 
