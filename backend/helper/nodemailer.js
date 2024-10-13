@@ -250,6 +250,105 @@ async function handleBookingCreation(centerName, name, userEmail, phone, service
     }
   );
 }
+// Rescheduling Email
+function generateBookingRescheduleEmail(centerName, name, newBookingDate, newBookingTime) {
+  return `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="background-color: #f7f7f7; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto;">
+        <h1 style="text-align: center; color: #4CAF50;">Booking Rescheduled</h1>
+        <p style="text-align: right; font-size: 14px; color: #777;">Date: ${new Date().toLocaleDateString('en-GB')}</p>
+        
+        <p>Dear <strong>${name}</strong>,</p>
+        
+        <p>We wanted to inform you that your booking at <strong>${centerName}</strong> has been successfully rescheduled by our team. Please find the updated booking details below:</p>
+        
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li><strong>New Booking Date:</strong> ${newBookingDate}</li>
+          <li><strong>New Booking Time:</strong> ${newBookingTime}</li>
+        </ul>
+
+        <p>If you have any questions or require further assistance, please don't hesitate to contact us. Thank you for your understanding and continued support.</p>
+        
+        <p style="margin-top: 40px;">Kind Regards,</p>
+        <p><strong>${centerName} Team</strong></p>
+      </div>
+      
+      <p style="text-align: center; font-size: 12px; color: #999; margin-top: 20px;">
+        © ${new Date().getFullYear()} ${centerName}. All rights reserved.
+      </p>
+    </div>
+  `;
+}
+async function handleBookingReschedule(centerName, name, userEmail, newBookingDate, newBookingTime) {
+  transporter.sendMail({
+      from: NODEMAILER_EMAIL,
+      to: userEmail,
+      subject: `Your Booking at ${centerName} has been rescheduled`,
+      html: generateBookingRescheduleEmail(centerName, name, newBookingDate, newBookingTime),
+    }, (error, info) => {
+      error ? console.log('Error sending email:', error) : console.log('Email sent:', info.response);
+    }
+  );
+}
+// Booking Status Update
+function generateBookingStatusUpdateEmail(centerName, name, status) {
+  const statusMessage = {
+    pending: 'Your booking is currently pending.',
+    confirmed: 'Your booking has been confirmed.',
+    rescheduled: 'Your booking has been rescheduled.',
+    cancelled: 'Your booking has been cancelled.',
+    completed: 'Your booking has been completed. We would love to hear your feedback!',
+  }[status.toLowerCase()] || 'Your booking status has been updated.';
+
+  const reviewRequestHTML = status.toLowerCase() === 'completed' ? `
+    <p>We hope you had a great experience with us. Your feedback is very important to us and helps us to improve our services.</p>
+    <p>Please take a moment to <a href="#" style="color: #4CAF50;">leave a review</a> and let us know how we did.</p>
+  ` : '';
+
+  return `
+    <div style="font-family: Arial, sans-serif; color: #333;">
+      <div style="background-color: #f7f7f7; padding: 20px; border-radius: 10px; max-width: 600px; margin: auto;">
+        <h1 style="text-align: center; color: #4CAF50;">Booking Status Update</h1>
+        <p style="text-align: right; font-size: 14px; color: #777;">Date: ${new Date().toLocaleDateString('en-GB')}</p>
+        
+        <p>Dear <strong>${name}</strong>,</p>
+        
+        <p>${statusMessage} Here are the details of your booking:</p>
+        
+        <ul style="list-style-type: none; padding-left: 0;">
+          <li><strong>Booking Status:</strong> ${status.charAt(0).toUpperCase() + status.slice(1)}</li>
+        </ul>
+
+        ${reviewRequestHTML}
+
+        <p>If you have any questions or need further assistance, feel free to reach out to us.</p>
+        
+        <p style="margin-top: 40px;">Kind Regards,</p>
+        <p><strong>${centerName} Team</strong></p>
+      </div>
+      
+      <p style="text-align: center; font-size: 12px; color: #999; margin-top: 20px;">
+        © ${new Date().getFullYear()} ${centerName}. All rights reserved.
+      </p>
+    </div>
+  `;
+}
+async function handleBookingStatusUpdate(centerName, name, userEmail, status) {
+  transporter.sendMail({
+      from: NODEMAILER_EMAIL,
+      to: userEmail,
+      subject: `Booking Status Update: ${status.charAt(0).toUpperCase() + status.slice(1)} at ${centerName}`,
+      html: generateBookingStatusUpdateEmail(centerName, name, status),
+    }, (error, info) => {
+      if (error) {
+        console.log('Error sending email:', error);
+      } else {
+        console.log('Email sent:', info.response);
+      }
+    }
+  );
+}
+
 
 
 
@@ -259,4 +358,6 @@ export default {
   handleResetPassword,
   handleCenterCreationNotification,
   handleBookingCreation,
+  handleBookingReschedule,
+  handleBookingStatusUpdate,
 }

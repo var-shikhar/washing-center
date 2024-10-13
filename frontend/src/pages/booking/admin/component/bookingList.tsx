@@ -1,73 +1,152 @@
-import CustomTooltip from '@/components/custom/customTooltip'
-import { TService } from '@/lib/commonTypes'
-import { IconEdit, IconLock, IconLockOpenOff, IconTrash } from '@tabler/icons-react'
+import CustomDialog from '@/components/custom/customDialog';
+import CustomTooltip from '@/components/custom/customTooltip';
+import { TBookingList } from '@/lib/commonTypes';
+import { IconCalendarClock, IconLayoutDashboard, IconStatusChange } from '@tabler/icons-react';
+import { startTransition, useState } from 'react';
+import ReschedulingForm from './rescheduleForm';
+import BookingStatusForm from './statusForm';
 
 type TBookingListProps = {
-  list: TService[];
-  handleDelete: (serviceID: string) => void;
-  handleUpdate: (serviceID: string, value: boolean) => void;
-  handleEdit: (serviceID: string, title: string) => void;
+  list: TBookingList[];
+  handleConfirmation: () => void;
 }
 
-const BookingList = ({list, handleEdit, handleDelete, handleUpdate}: TBookingListProps) => {
+const BookingList = ({list, handleConfirmation}: TBookingListProps) => {
+  const [modalToggle, setModalToggle] = useState(false)
+  const [modalMode, setModalMode] = useState('View')
+  const [selectedBooking, setSelectedBooking] = useState<TBookingList>({} as TBookingList)
+
+  function handleModalToggle(item:TBookingList, mode: string){
+    startTransition(() => {
+      setSelectedBooking(item)
+      setModalToggle(true)
+      setModalMode(mode)
+    })
+  }
+
+  function handleFormConfirmation(){
+    setModalToggle(!modalToggle)
+    handleConfirmation()
+  }
+
+  const BookingDetail = () => {
+    return (
+      <div className='rounded bg-slate-300 p-3'>
+        <div className='text-2xl font-semibold'>{selectedBooking.serviceName}</div>
+        {selectedBooking?.addonList?.length > 0 && 
+        <>
+          <div className='border-t-2 border-b-2 my-2'>Addon List</div>
+          <div className='flex gap-2 flex-col'>
+            {selectedBooking?.addonList?.map(item => <b key={item.addonID}>{item.addonName}</b>)}
+          </div>
+        </>
+        }
+
+      </div>
+    )
+  }
+
   return (
     <div className='overflow-x-auto overscroll-y-none'>
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-100">
           <tr>
             <th className="px-2 rounded-s py-3 text-left font-bold text-xs text-white bg-black uppercase tracking-wider md:px-6">S.No.</th>
-            <th className="px-2 py-3 text-left font-bold text-xs text-white bg-black uppercase tracking-wider md:px-6">Client Name</th>
-            <th className="px-2 py-3 text-left font-bold text-xs text-white bg-black uppercase tracking-wider md:px-6">Booking Date & Time</th>
-            <th className="px-2 py-3 text-left font-bold text-xs text-white bg-black uppercase tracking-wider md:px-6">Vehicle Type</th>
-            <th className="px-2 py-3 text-left font-bold text-xs text-white bg-black uppercase tracking-wider md:px-6">Price</th>
-            <th className="px-2 py-3 text-left font-bold text-xs text-white bg-black uppercase tracking-wider md:px-6">Is Customizable</th>
-            <th className="px-2 py-3 text-left font-bold text-xs text-white bg-black uppercase tracking-wider md:px-6">Status</th>
+            <th className='px-2 py-3 bg-black'><div className="text-left bg-black font-bold text-xs text-white  uppercase tracking-wider w-max">Appointment ID</div></th>
+            <th className='px-2 py-3 bg-black'><div className="text-left bg-black font-bold text-xs text-white  uppercase tracking-wider w-max">Client Details</div></th>
+            <th className='px-2 py-3 bg-black'><div className="text-left bg-black font-bold text-xs text-white  uppercase tracking-wider w-max">Appintment Date & Time</div></th>
+            <th className='px-2 py-3 bg-black'><div className="text-left bg-black font-bold text-xs text-white  uppercase tracking-wider w-max">Booked Service</div></th>
+            <th className='px-2 py-3 bg-black'><div className="text-left bg-black font-bold text-xs text-white  uppercase tracking-wider w-max">Total Amount</div></th>
+            <th className='px-2 py-3 bg-black'><div className="text-left bg-black font-bold text-xs text-white  uppercase tracking-wider w-max">Message</div></th>
+            <th className='px-2 py-3 bg-black'><div className="text-left bg-black font-bold text-xs text-white  uppercase tracking-wider w-max">Status</div></th>
             <th className="px-2 rounded-e py-3 text-left font-bold text-xs text-white bg-black uppercase tracking-wider md:px-6">Interact</th>
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {list?.map((item, index) => (
-            <tr key={item.id} className="bg-gray-50 hover:bg-gray-100">
-              <td className="px-2 py-4 text-sm text-gray-900 md:px-6">{index + 1}</td>
-              <td className="px-2 py-4 text-sm text-gray-900 md:px-6">{item.serviceName}</td>
-              <td className="px-2 py-4 text-sm text-center text-gray-900 md:px-6">{item.categoryName}</td>
-              <td className="px-2 py-4 text-sm text-center text-gray-900 md:px-6">{item.vehicleName}</td>
-              <td className="px-2 py-4 text-sm text-gray-900 md:px-6">
-                <div className="flex items-center justify-center space-x-2">
-                  <span className="line-through text-red-500">₹{item.price}</span>
-                  <span className='font-bold'>₹{item.discPrice}/-</span>
+            <tr key={item.id} className="bg-gray-50 text-gray-900 hover:bg-gray-100">
+              <td className="py-4 text-center relative">
+                {item.isRescheduled && <div className='absolute top-0 left-0 rounded-r-sm px-3 text-sm font-semibold bg-red-300 text-red-600'>Rescheduled</div>}
+                {index + 1}
+              </td>
+              <td className="py-4">{item.id}</td>
+              <td className="py-4 text-center">{item.clientName}<br /> <small>{item.clientNumber}</small></td>
+              <td className="py-4 text-center">
+                {new Date(item.appointmentDate).toLocaleDateString('en-GB')} <br />
+                {new Date(`1970-01-01T${item.appointmentTime}`).toLocaleTimeString('en-US', {
+                    hour: 'numeric',
+                    minute: 'numeric',
+                    hour12: true
+                })}
+              </td>
+              <td className="py-4 text-center">{item.serviceName}</td>
+              <td className="py-4 text-center">₹ {item.totalAmount}/-</td>
+              <td className="py-4">
+                <div className='text-center w-28 truncate'>
+                  <CustomTooltip 
+                    content={item.message} 
+                    trigger={<div className='w-[100%] truncate'>{item.message}</div>}
+                  />
                 </div>
               </td>
-              <td className="px-2 py-4 text-sm text-center text-gray-900 md:px-6">{item.isCustomizable ? 'Yes' : 'No'}</td>
-              <td className="px-2 py-4 text-sm text-center text-gray-900 md:px-6">{item.isAvailable ? 'Active' : 'In-Active'}</td>
-              <td className="px-2 py-4 text-sm text-gray-900 md:px-6">
-              <div className='flex gap-2'>
+              <td className="py-4 text-center">{item.status}</td>
+              <td className="py-4">
+                <div className='flex justify-center gap-2'>
                   <CustomTooltip 
-                    content={'Edit Center Details'} 
+                    content={'View Booked Services'} 
                     trigger={
-                      <IconEdit className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' size={'25'} onClick={() => handleEdit(item.id, 'Edit Center Details')} />
+                      <IconLayoutDashboard 
+                        className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' 
+                        size={'25'} 
+                        onClick={() => handleModalToggle(item, 'View')} 
+                      />
                     }
                   />
                   <CustomTooltip 
-                    content={item.isAvailable ? 'InActivate Center' : 'Activate Center'} 
+                    content={'Reschedule Booking Request'} 
                     trigger={
-                      item.isAvailable
-                        ? <IconLock className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' size={'25'} onClick={() => handleUpdate(item.id, !item.isAvailable)} />
-                        : <IconLockOpenOff className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' size={'25'} onClick={() => handleUpdate(item.id, !item.isAvailable)} />
+                      <IconCalendarClock 
+                        className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' 
+                        size={'25'} 
+                        onClick={() => handleModalToggle(item, 'ReSchedule')}
+                      />
                     }
                   />
-                  <CustomTooltip 
-                    content={'Delete Center'} 
-                    trigger={
-                      <IconTrash className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' size={'25'} onClick={() => handleDelete(item.id)} />
-                    }
-                  />
+                  {item.status !== 'Cancelled' && item.status !== 'Completed' && 
+                    <CustomTooltip 
+                      content={'Update Booking Status'} 
+                      trigger={
+                        <IconStatusChange 
+                          className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' 
+                          size={'25'} 
+                          onClick={() => handleModalToggle(item, 'Status')}
+                        />
+                      }
+                    />
+                  }
                 </div>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+
+      <CustomDialog 
+        isOpen={modalToggle}
+        setISOpen={setModalToggle}
+        hasTrigger={false}
+        title={modalMode === 'View' ? 'Booking Details' : modalMode === 'ReSchedule' ? `Reschedule ${selectedBooking.clientName}'s Booking` : 'Update Booking Status'}
+        customWidth='20vw'
+        contentNode={
+          <>{
+            modalMode === 'View' 
+            ? <BookingDetail />
+            : modalMode === 'ReSchedule' 
+            ? <ReschedulingForm bookingID={selectedBooking.id} handleConfirmation={handleFormConfirmation} />
+            : <BookingStatusForm bookingID={selectedBooking.id} prevStatus={selectedBooking.status} handleConfirmation={handleFormConfirmation} />
+          }</>
+        }
+      />
     </div>
   )
 }

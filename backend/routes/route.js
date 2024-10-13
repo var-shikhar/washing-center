@@ -25,6 +25,13 @@ router.route('/admin/service/list/:centerID').get(isAuth, serviceController.getS
 router.route('/admin/service').post(isAuth, serviceController.postService).put(isAuth, serviceController.putServiceDetails)
 router.route('/admin/service/:serviceID').get(isAuth, serviceController.getInitServiceForm).put(isAuth, serviceController.putServiceStatus).delete(isAuth, serviceController.deleteService);
 
+router.route('/admin/booking/api').get(bookingController.getBookingAPIData)
+router.route('/admin/booking/reschedule').put(isAuth, bookingController.putRescheduleBooking)
+router.route('/admin/booking/:centerID?').get(isAuth, bookingController.getBookingList).put(isAuth, bookingController.putBookingStatusUpdate)
+router.route('/admin/booking/service/:centerID?').get(isAuth, bookingController.getServiceList).post(isAuth, bookingController.postAdminServiceBooking)
+
+
+
 // Public Controller
 router.route('/public/center/list/:lat/:long/:radius').get(centerController.getPublicCenterList);
 router.route('/public/center/service/:centerID').get(centerController.getCenterServices);

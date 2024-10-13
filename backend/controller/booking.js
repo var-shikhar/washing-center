@@ -11,7 +11,7 @@ import ServiceItem from '../modal/serviceItem.js';
 
 dotenv.config();
 const { RouteCode } = constant;
-const { handleLoginOTP, handleBookingCreation } = MAILER;
+const { handleLoginOTP, handleBookingCreation, handleBookingReschedule, handleBookingStatusUpdate } = MAILER;
 const { JWT_SECRET_KEY } = process.env;
 
 
@@ -19,8 +19,6 @@ async function sendOTPforLogin(userID, userEmail){
     const sharedOTP = await generateOTP(userID);
     await handleLoginOTP(userEmail, sharedOTP);
 }
-
-
 const postValidateEmail = async (req, res) => {
     const { userEmail } = req.body;
     try {
@@ -35,7 +33,6 @@ const postValidateEmail = async (req, res) => {
         const newUser = new User({
             email: userEmail,
             name: 'User',
-            phone: '',
             password: 'User@1234',
             isActive: false,
             isAdmin: false,
@@ -152,7 +149,279 @@ const postPublicServiceBooking = async (req, res) => {
     }
 }
 
+
+
+
+// Admin Booking Controller
+const getBookingAPIData = async (req, res) => {
+    try {
+        const foundServices = await ServiceItem.find();    
+        const serviceList = foundServices?.length > 0  ? foundServices?.map(item => {return { id: item._id, name: item.name }}) : [];
+        return res.status(RouteCode.SUCCESS.statusCode).json(serviceList);
+    } catch (err) {
+        console.error('Error retrieving service list:', err);
+        return res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message });
+    }
+};
+const getBookingList = async (req, res) => {
+    const userID = req.user;
+    const { centerID } = req.params;
+    try {
+        const foundUser = await User.findById(userID);
+        const foundCenter = await Center.findById(centerID);
+
+        if (!foundUser || !foundCenter) {
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({ 
+                message: `${foundCenter ? 'Something went wrong' : 'Unauthorized access'}, Try later!` 
+            });
+        }
+
+        const foundBookings = await Booking.find({ centerID: centerID })
+            .populate({
+            path: 'serviceID',
+            select: 'serviceID',
+            populate: {
+                path: 'serviceID',
+                model: 'ServiceItem',
+                select: 'name'
+            }
+            })
+            .populate({
+            path: 'serviceAddons.addonID',
+            model: 'ServiceItem',
+            select: 'name'
+            })
+            .sort({ createdAt: -1 });
+    
+        const bookingList = (foundBookings || []).map(item => {
+            return {
+                id: item._id,
+                clientName: item.userName || 'Unknown',
+                clientNumber: item.userPhone || 'N/A',
+                appointmentDate: item.bookingDate || 'Not specified',
+                appointmentTime: item.bookingTime || 'Not specified',
+                totalAmount: item.totalAmount || 0,
+                message: item.message || '',
+                status: item.status || 'Pending',
+                serviceID: item.serviceID?.serviceID?._id,
+                serviceName: item.serviceID?.serviceID?.name || 'Unknown Service',
+                isRescheduled: item.isReschedules || false,
+                addonList: item.serviceAddons?.map(addon => {
+                    if (addon.addonID) { 
+                        return {
+                            addonID: addon.addonID._id,
+                            addonName: addon.addonID.name,
+                        };
+                    }
+                    return null;
+                }).filter(Boolean),
+            };
+        });
+
+        res.status(RouteCode.SUCCESS.statusCode).json(bookingList);
+    } catch (err) {
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message });
+    }
+};
+const putRescheduleBooking = async (req, res) => {
+    const userID = req.user;
+    const { id, newDate, newTime } = req.body;
+    try{
+        const foundUser = await User.findById(userID);
+        const foundBooking = await Booking.findById(id).populate('centerID');
+
+        if (!foundUser || !foundBooking) {
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({message: `${!foundBooking ? 'Booking' : 'User'} not found, Try later!`});
+        }
+        
+        foundBooking.bookingDate = new Date(newDate) || foundBooking.bookingDate;
+        foundBooking.bookingTime = newTime || foundBooking.bookingTime;
+        foundBooking.isReschedules = true;
+        foundBooking.status = 'Rescheduled';
+        foundBooking.bookingLog.push({
+            bookingDate: new Date(newDate),
+            bookingTime: newTime
+        })
+
+        await foundBooking.save();
+        await handleBookingReschedule(foundBooking.centerID.name, foundBooking.userName, foundUser.email, newDate, newTime); 
+        res.status(RouteCode.SUCCESS.statusCode).json({message: 'Booking has rescheduled successfully!'})        
+    } catch(err){
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
+    }
+}
+const putBookingStatusUpdate = async (req, res) => {
+    const userID = req.user;
+    const { id, statusID } = req.body;
+    try{
+        const foundUser = await User.findById(userID);
+        const foundBooking = await Booking.findById(id).populate('centerID');;
+        if (!foundUser || !foundBooking) {
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({message: `${!foundBooking ? 'Booking' : 'User'} not found, Try later!`});
+        }
+        
+        foundBooking.status = statusID || 'Pending';
+        await foundBooking.save();
+
+        await handleBookingStatusUpdate(foundBooking.centerID.name, foundBooking.userName, foundUser.email, statusID); 
+        res.status(RouteCode.SUCCESS.statusCode).json({message: 'Booking Status has updated successfully!'})        
+    } catch(err){
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
+    }
+}
+const getServiceList = async (req, res) => {
+    const userID = req.user;
+    const { centerID } = req.params;
+    try {
+        const foundUser = await User.findById(userID);
+        const foundCenter = await Center.findById(centerID);
+
+        if(!foundUser || !foundCenter){
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'Unauthorized access, Try later!'})
+        }
+
+        const foundServiceList = await Service.find({ centerID: foundCenter._id, isAvailable: true })
+            .populate({ path: 'serviceID', select: 'name',})
+            .populate({ path: 'addons.addonID', select: 'name description' })
+            .exec();
+
+        const serviceList = foundServiceList?.map(item => {
+            return {
+                id: item._id,
+                serviceID: item.serviceID,
+                serviceName: item.serviceID.name,
+                price: item.price,
+                discPrice: item.discPrice,
+                isAvailable: item.isAvailable,
+                isCustomizable: item.isCustomizable,
+                addons: item.addons?.map(addon => {
+                    return {
+                        serviceID: addon.addonID._id,
+                        serviceName: addon.addonID.name,
+                        serviceDescription: addon.addonID.description,
+                        price: addon.price,
+                        discPrice: addon.discPrice,
+                    }
+                })
+            }
+        });
+
+    
+        const finalServiceList = serviceList?.map(item => {
+            let tempTotal = 0;
+            let tempDiscountedTotal = 0;
+        
+            item.addons?.forEach(subItem => {
+                tempTotal += subItem.price;
+                tempDiscountedTotal += subItem.discPrice;
+            });
+        
+            return {
+                ...item,
+                totalPrice: item.price + tempTotal,
+                totalDiscountedPrice: item.discPrice + tempDiscountedTotal,
+            };
+        }) || [];
+
+        return res.status(RouteCode.SUCCESS.statusCode).json(finalServiceList);
+    } catch (err) {
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
+    }
+}
+async function handleUserCreationthroughAdmin(userEmail, userPhone, userName){
+    let foundUser = await User.findOne({ email: userEmail });
+    if (!foundUser && userPhone) { // Run this when no user found with email
+        foundUser = await User.findOne({ phone: userPhone });
+    }
+
+    if (!foundUser) { // Run this when no user found with email and phone
+        const newUser = new User({
+            name: userName,
+            email: userEmail,
+            phone: userPhone,
+            password: 'User@1234',
+            isActive: false,
+            isAdmin: false,
+            isMember: true,
+            isEmailVerified: false,
+            userRole: 'Client',
+        });
+        await newUser.save();
+        return newUser
+    }
+
+    return foundUser;
+}
+const postAdminServiceBooking = async (req, res) => {
+    const userID = req.user;
+    const { userName, userPhone, userEmail,  bookingDate, bookingTime, message, serviceID, centerID, servicePrice, serviceAddons, isCustomizable, totalDiscountedPrice, totalPrice } = req.body;
+    
+    try{
+        const foundCenter = await Center.findById(centerID);
+        const foundAdmin = await User.findById(userID);
+        if (!foundAdmin || !foundCenter) {
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({message: `${!foundCenter ? 'Center not found' : 'Unauthorized access'}, Try later!`});
+        }
+        
+        const foundUser = await handleUserCreationthroughAdmin(userEmail, userPhone, userName);
+        const newBooking = new Booking({
+            user: foundUser._id,
+            userName: userName,
+            userPhone: userPhone,
+            centerID: centerID,
+            serviceID: serviceID,
+            servicePrice: servicePrice,
+            isCustomizable: isCustomizable,
+            bookingDate: new Date(bookingDate),
+            bookingTime: bookingTime,
+            isReschedules: false,
+            totalAmount: totalDiscountedPrice,
+            discount: 0,
+            status: 'Pending',
+            paymentStatus: 'Unpaid',
+            message: message,
+            serviceAddons: serviceAddons ? serviceAddons.map(item => {
+                return { addonID: item.addonID, addonPrice: item.addonDiscPrice };
+            }) : []
+        });
+
+        newBooking.bookingLog.push({bookingDate: new Date(bookingDate), bookingTime: bookingTime,})
+        await newBooking.save();
+
+        let serviceNameList = [];
+        
+        serviceNameList.push(await getServiceName(serviceID, 'service'));
+        if (serviceAddons) {
+            for (const item of serviceAddons) {
+                serviceNameList.push(await getServiceName(item.addonID, 'addon'));
+            }
+        }
+
+        serviceNameList = serviceNameList.filter(item => item !== false);
+        await handleBookingCreation(foundCenter.name, userName, foundUser.email, userPhone, serviceNameList, bookingDate, bookingTime, message) 
+        res.status(RouteCode.SUCCESS.statusCode).json(newBooking._id)        
+    } catch(err){
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
+    }
+}
+
+
+
+
+
+
+
+
 export default {
     postValidateEmail, putValidateOTP,
     postPublicServiceBooking,
+
+    // Admin Booking
+    getBookingAPIData, getBookingList, putRescheduleBooking, putBookingStatusUpdate,
+    getServiceList, postAdminServiceBooking
 }

@@ -61,3 +61,21 @@ export type TCenter = {
         long: number,
     },   
 }
+
+export type TBookingList = {
+    id: string;
+    clientName: string;
+    clientNumber: string;
+    appointmentDate: Date,
+    appointmentTime: string;
+    isRescheduled: boolean;
+    message: string;
+    serviceID: string;
+    serviceName: string;
+    addonList: {
+        addonID: string;
+        addonName: string;
+    }[];
+    totalAmount: number;
+    status: string;
+}

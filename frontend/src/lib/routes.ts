@@ -15,6 +15,12 @@ const getAPIServiceForm = `${BACKEND_ROUTE}/admin/service/api`;
 const commonServiceRoute = `${BACKEND_ROUTE}/admin/service`;
 const getServiceList = `${BACKEND_ROUTE}/admin/service/list`;
 
+// Booking Routes
+const getAPIBooking = `${BACKEND_ROUTE}/admin/booking/api`;
+const commonBookingRoute = `${BACKEND_ROUTE}/admin/booking`;
+const commonBookingRescheduleRoute = `${BACKEND_ROUTE}/admin/booking/reschedule`;
+const commonAdminServiceBooking = `${BACKEND_ROUTE}/admin/booking/service`;
+
 
 // Public Routes
 const publicCenterListRoute = `${BACKEND_ROUTE}/public/center/list`;
@@ -32,6 +38,7 @@ const ROUTES = {
     commonRegisterRoute, commonLoginRoute, getLogoutRoute, commonForgotPasswordRoute,
     authCenterRoute, commonCenterRoute,
     getAPIServiceForm, commonServiceRoute, getServiceList,
+    getAPIBooking, commonBookingRoute, commonBookingRescheduleRoute, commonAdminServiceBooking,
 
 
     // Public Routes

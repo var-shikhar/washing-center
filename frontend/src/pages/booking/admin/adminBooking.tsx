@@ -1,27 +1,22 @@
 import { Button } from '@/components/custom/button'
+import CustomDialog from '@/components/custom/customDialog'
+import FilterSelect from '@/components/filterSelect'
 import ThemeSwitch from '@/components/theme-switch'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { UserNav } from '@/components/user-nav'
 import { Layout } from '@/context/layout'
-import useService from '@/hooks/service/use-service'
-import {
-    IconAdjustmentsHorizontal,
-    IconSortAscendingLetters,
-    IconSortDescendingLetters
-} from '@tabler/icons-react'
+import useAdminBooking from '@/hooks/booking/use-admin-booking'
+import CONSTANT from '@/lib/constant'
+import { IconAdjustmentsHorizontal } from '@tabler/icons-react'
 import BookingList from './component/bookingList'
+import BackendBookingForm from './component/backendBookingForm'
+
+const { sortingList } = CONSTANT;
+
 
 export default function AdminBookingPanel() {
-  const { filteredList, handleConfirmation, modalToggle, searchTerm, selectedSort, setModalToggle, setSearchTerm, setSelectedSort, modalData, setModalData, handleServiceDeletion, handleServiceStatusUpdate } = useService();
+  const { filteredList,  modalToggle,  selectedSort, setModalToggle, setSearchTerm, searchTerm, setSelectedSort, modalData, setModalData, apiData, handleConfirmation, selectedService, setSelectedService } = useAdminBooking();
 
   function handleCenterForm(id: string, title: string){
     setModalToggle(true);
@@ -42,10 +37,10 @@ export default function AdminBookingPanel() {
       <Layout.Body className='flex flex-col'>
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>
-            Service List
+            Booking List
           </h1>
           <p className='text-muted-foreground'>
-            View and manage all your services at one place.
+            View and manage all your bookings at one place.
           </p>
         </div>
         <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
@@ -56,48 +51,51 @@ export default function AdminBookingPanel() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            <Select value={selectedSort} onValueChange={setSelectedSort}>
-              <SelectTrigger className='w-16'>
-                <SelectValue>
-                  <IconAdjustmentsHorizontal size={18} />
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent align='end'>
-                <SelectItem value='ascending'>
-                  <div className='flex items-center gap-4'>
-                    <IconSortAscendingLetters size={16} />
-                    <span>Ascending</span>
-                  </div>
-                </SelectItem>
-                <SelectItem value='descending'>
-                  <div className='flex items-center gap-4'>
-                    <IconSortDescendingLetters size={16} />
-                    <span>Descending</span>
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <FilterSelect
+              list={sortingList}
+              onChange={(value: string) => setSelectedSort(value)}
+              selectLabel={{
+                icon: <IconAdjustmentsHorizontal />,
+                name: 'Sort List',
+              }}
+              selectedValue={selectedSort}
+              slug={{
+                label: 'label',
+                value: 'value'
+              }}
+            />
+            <FilterSelect
+              list={apiData}
+              onChange={(value: string) => setSelectedService(value)}
+              selectLabel={{
+                icon: <IconAdjustmentsHorizontal />,
+                name: 'Select Service',
+              }}
+              selectedValue={selectedService}
+              slug={{
+                label: 'name',
+                value: 'id'
+              }}
+            />
           </div>
-          <Dialog open={modalToggle} onOpenChange={setModalToggle}>
-            <DialogTrigger asChild>
-              <Button type='button' onClick={() => handleCenterForm('', 'Add New Service')}>Add New Service</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[50vw]">
-              <DialogHeader>
-                <DialogTitle>{modalData.title}</DialogTitle>
-              </DialogHeader> 
-              {/* <ServiceForm 
-                formID={modalData.id} 
+          <CustomDialog 
+            isOpen={modalToggle}
+            setISOpen={setModalToggle}
+            hasTrigger
+            triggerNode={<Button type='button' onClick={() => handleCenterForm('', 'Add New Booking')}>Add New Booking</Button>}
+            title={modalData.title}
+            contentNode={
+              <BackendBookingForm 
                 handleConfirmation={() => {
                   handleConfirmation()
-                  setModalToggle(false)
-                }}
-              /> */}
-            </DialogContent>
-          </Dialog>
+                  setModalToggle(!modalToggle)
+                }} 
+              />
+            }
+          />
         </div>
         <Separator className='shadow' />
-        <BookingList list={filteredList} handleDelete={handleServiceDeletion} handleUpdate={handleServiceStatusUpdate} handleEdit={handleCenterForm} />
+        <BookingList list={filteredList} handleConfirmation={handleConfirmation} />
       </Layout.Body>
     </Layout>
   )
