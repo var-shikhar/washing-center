@@ -23,6 +23,11 @@ export default function ResetPassword() {
             setToken(token)
         })        
     }, [location])
+
+    if(token === null){
+      return 
+    }
+    
   return (
     <>
       <div className='container grid h-svh flex-col items-center justify-center bg-primary-foreground lg:max-w-none lg:px-0'>

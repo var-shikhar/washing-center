@@ -15,7 +15,7 @@ const { handleGMapURL, getTimeinAMPMfromTimeString } = commonFn;
 
 const PublicServiceList = () => {
     const { id }  = useParams();
-    const { centerData, filteredList, searchedText, dialogToggle, dialogData, formToggle, confirmationToggle, bookingID, setBookingID, setConfirmationToggle, setFormToggle, setDialogData, setDialogToggle, setSearchedText, handleBookingToggle, handleServiceSelection } = usePublicServiceList(id ?? '');
+    const { centerData, filteredList, searchedText, dialogToggle, dialogData, formToggle, confirmationToggle, bookingID, setBookingID, setConfirmationToggle, setFormToggle, setDialogToggle, setSearchedText, handleBookingToggle, handleServiceSelection } = usePublicServiceList(id ?? '');
 
     const ServiceDetail = () => {
         return (

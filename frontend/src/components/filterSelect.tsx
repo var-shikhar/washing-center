@@ -1,13 +1,8 @@
-import React, { useEffect } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { IconAdjustmentsHorizontal } from '@tabler/icons-react';
+import { useEffect } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type TFilterSelectProps<T extends Record<string, string>> = {
-    selectLabel: {
-        name?: string;
-        icon?: React.ReactNode;
-        iconSize?: number;
-    };
     list: T[];
     slug: {
         label: keyof T;
@@ -18,7 +13,6 @@ type TFilterSelectProps<T extends Record<string, string>> = {
 };
 
 const FilterSelect = <T extends Record<string, string>>({
-    selectLabel,
     list,
     slug,
     selectedValue,

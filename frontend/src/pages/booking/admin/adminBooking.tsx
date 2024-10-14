@@ -8,9 +8,8 @@ import { UserNav } from '@/components/user-nav'
 import { Layout } from '@/context/layout'
 import useAdminBooking from '@/hooks/booking/use-admin-booking'
 import CONSTANT from '@/lib/constant'
-import { IconAdjustmentsHorizontal } from '@tabler/icons-react'
-import BookingList from './component/bookingList'
 import BackendBookingForm from './component/backendBookingForm'
+import BookingList from './component/bookingList'
 
 const { sortingList } = CONSTANT;
 
@@ -54,10 +53,6 @@ export default function AdminBookingPanel() {
             <FilterSelect
               list={sortingList}
               onChange={(value: string) => setSelectedSort(value)}
-              selectLabel={{
-                icon: <IconAdjustmentsHorizontal />,
-                name: 'Sort List',
-              }}
               selectedValue={selectedSort}
               slug={{
                 label: 'label',
@@ -67,10 +62,6 @@ export default function AdminBookingPanel() {
             <FilterSelect
               list={apiData}
               onChange={(value: string) => setSelectedService(value)}
-              selectLabel={{
-                icon: <IconAdjustmentsHorizontal />,
-                name: 'Select Service',
-              }}
               selectedValue={selectedService}
               slug={{
                 label: 'name',

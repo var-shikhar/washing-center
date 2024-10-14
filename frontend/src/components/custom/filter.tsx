@@ -1,7 +1,5 @@
-import * as React from 'react';
-import { CheckIcon, PlusCircledIcon } from '@radix-ui/react-icons';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/custom/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Command,
   CommandEmpty,
@@ -15,6 +13,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { TFilterTypes } from '@/hooks/public/use-center-list';
+import { CheckIcon, PlusCircledIcon } from '@radix-ui/react-icons';
 
 interface MultiSelectProps {
   title: string;

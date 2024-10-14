@@ -45,7 +45,7 @@ export default function Otp() {
                 authentication code to your email.
               </p>
             </div>
-            <OTPForm submissionURL={ROUTES.commonRegisterRoute} submissionType='put' successMessage='Account has activated successfully!' successFn={(userID: string) => navigate('../')} />
+            <OTPForm submissionURL={ROUTES.commonRegisterRoute} submissionType='put' successMessage='Account has activated successfully!' successFn={(userID: string) => {console.log(userID); navigate('../')}} />
             <p className='mt-4 px-8 text-center text-sm text-muted-foreground'>
               Haven't received it?{' '} &nbsp;
               <b
