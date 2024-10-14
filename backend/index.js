@@ -17,7 +17,7 @@ const app = express();
 connectDB();
 
 app.use(cors({
-    origin: [FRONTEND_URL, 'http://localhost:5173', 'http://127.0.0.1:3000', 'http://localhost:3001', 'http://127.0.0.1:3001', 'http://krivis.in', 'https://www.krivis.in', 'https://krivis.in'],
+    origin: [FRONTEND_URL, 'http://localhost:5173', 'http://127.0.0.1:3000', 'http://localhost:3001', 'http://127.0.0.1:3001', 'https://washing-center.onrender.com'],
     methods: 'GET, POST, PUT, DELETE',
     allowedHeaders: 'Content-Type, Authorization, x-auth-token',
     credentials: true
@@ -40,12 +40,12 @@ app.use(compression({
   threshold: 1024
 }));
 
+app.use('/', express.static(path.join(__dirname, 'frontend', 'dist')));
 import routeHandler from './routes/route.js';
 app.use('/', routeHandler);
 
-
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
 });
 
 mongoose.connection.once('connected', async () => {
