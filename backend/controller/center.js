@@ -432,6 +432,7 @@ const getPublicCenterList = async (req, res) => {
                             lat: center.coordinates.coordinates[1] ?? 0,
                             long: center.coordinates.coordinates[0] ?? 0,
                         },
+                        distance: 0,
                         services: services.map(service => ({
                             id: service._id,
                             serviceID: service.serviceID._id,

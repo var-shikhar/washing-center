@@ -5,6 +5,7 @@ import { Button } from './custom/button'
 import Nav from './nav'
 import { cn } from '@/lib/utils'
 import useSideLinks from '@/hooks/useSideLink'
+import { useUserContext } from '@/context/userContext'
 interface SidebarProps extends React.HTMLAttributes<HTMLElement> {
   isCollapsed: boolean
   setIsCollapsed: React.Dispatch<React.SetStateAction<boolean>>
@@ -15,7 +16,8 @@ export default function Sidebar({
   isCollapsed,
   setIsCollapsed,
 }: SidebarProps) {
-  const {sidelinks} = useSideLinks();
+  const { userData } = useUserContext();
+  const { sidelinks } = useSideLinks();
   const [navOpened, setNavOpened] = useState(false)
 
   /* Make body not scrollable when navBar is opened */
@@ -81,7 +83,7 @@ export default function Sidebar({
               className={`flex flex-col justify-end truncate ${isCollapsed ? 'invisible w-0' : 'visible w-auto'}`}
             >
               <span className='font-medium'>Washing Center</span>
-              <span className='text-xs'>Admin Panel</span>
+              <span className='text-xs'>{userData?.userRole === 'Client' ? 'User Panel' : 'Admin Panel'}</span>
             </div>
           </div>
 

@@ -8,25 +8,14 @@ const LandingPage = () => {
   return (
     <>
       <Header activeHeader="Home" />
-      <section className="">
-        <div className="w-full border-0">
-          <svg
-            className="overflow-hidden"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="none"
-            version="1.1"
-            viewBox="0 0 2560 100"
-            x="0"
-            y="0"
-          >
-            <polygon className="fill-current" points="2560 0 2560 100 0 100" ></polygon>
-          </svg>
+      <section className="bg-[--deep-purple] py-24 pt-36">
+        <div className="container">
+          <div className="border-0 text-white text-4xl text-center">Book your next Car/Bike Washing Service Online</div>
         </div>
-        <div className="bg-[--deep-purple] border-0 text-white py-24 text-5xl text-center -mt-1">Book your next Car/Bike Washing Service Online</div>
       </section>
       <PublicCenterList />
-      <section className="relative bg-[--deep-purple] p-16">
-        <div className="container mx-auto sm:px-28">
+      <section className="bg-[--deep-purple] p-3 sm:p-16">
+        <div className="sm:container mx-auto sm:px-28">
           <div className="flex flex-wrap justify-center bg-white shadow-xl rounded-lg py-16 px-12 relative z-10">
             <div className="w-full text-center lg:w-8/12">
               <p className="text-4xl text-center">

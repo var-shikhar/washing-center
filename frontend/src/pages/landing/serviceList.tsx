@@ -15,7 +15,7 @@ const { handleGMapURL, getTimeinAMPMfromTimeString } = commonFn;
 
 const PublicServiceList = () => {
     const { id }  = useParams();
-    const { centerData, filteredList, isSticky, searchedText, dialogToggle, dialogData, formToggle, confirmationToggle, bookingID, setBookingID, setConfirmationToggle, setFormToggle, setDialogData, setDialogToggle, setSearchedText, handleBookingToggle } = usePublicServiceList(id ?? '');
+    const { centerData, filteredList, searchedText, dialogToggle, dialogData, formToggle, confirmationToggle, bookingID, setBookingID, setConfirmationToggle, setFormToggle, setDialogData, setDialogToggle, setSearchedText, handleBookingToggle, handleServiceSelection } = usePublicServiceList(id ?? '');
 
     const ServiceDetail = () => {
         return (
@@ -75,10 +75,10 @@ const PublicServiceList = () => {
         <>
             <Header activeHeader='' wrapperClass='relative' />
             <div className='w-[90%] sm:w-[80%] mx-auto'>
-                <div className={`transition-all duration-300 ${isSticky ? 'sticky top-0 z-50 w-[100%] bg-white' : 'relative bg-transparent'}`}>
+                <div className={`transition-all duration-300`}>
                     <div className='my-2'>
                         <div className='shadow-md rounded-xl border flex flex-col gap-2 p-4 items-center'>
-                            <div className='text-4xl font-semibold ps-1 py-3 truncate'>{centerData.centerName}</div>
+                            <div className='text-4xl font-semibold ps-1 py-3 truncate text-wrap text-center'>{centerData.centerName}</div>
                             <div className='flex gap-2 flex-wrap items-center justify-center'>
                                 <div className='flex items-center gap-2'>
                                     <span>
@@ -157,10 +157,7 @@ const PublicServiceList = () => {
                         <div 
                             key={item.id} 
                             className='flex justify-between items-center border rounded p-3 py-5 cursor-pointer relative' 
-                            onClick={() => {
-                                setDialogToggle(true);
-                                setDialogData(item)
-                            }}
+                            onClick={() => handleServiceSelection(item)}
                         >
                             {item.isCustomizable && <div className='absolute text-sm top-0 left-0 rounded-e-md bg-green-800 px-3 text-white'>Customizable Addons</div>}
                             <div className=''>

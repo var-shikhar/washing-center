@@ -1,4 +1,5 @@
 import cloudinary from 'cloudinary';
+import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -34,6 +35,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+app.use(compression({
+  level: 9,
+  threshold: 1024
+}));
 
 import routeHandler from './routes/route.js';
 app.use('/', routeHandler);

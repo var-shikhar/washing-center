@@ -69,7 +69,7 @@ const BookingForm = ({ className, bookedService, closingTime, centerID, handleCo
                     >Resend a new code.</b>
                 </p>
             </div>
-        :   <form onSubmit={handleSubmit(onSubmit)} className="p-6 bg-white rounded-lg shadow-md">
+        :   <form onSubmit={handleSubmit(onSubmit)} className="sm:p-6 bg-white rounded-lg sm:shadow-md">
                 {selectedPhase === 2 ? 
                     <> 
                         <div className='text-black font-semibold'>Service Price</div>

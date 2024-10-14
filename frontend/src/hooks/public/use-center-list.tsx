@@ -5,11 +5,12 @@ import { TCenter, TServiceCategory, TServiceItem, TServiceSkeleton, TServiceVehi
 import ROUTES from '@/lib/routes';
 import { startTransition, useEffect, useLayoutEffect, useState } from 'react';
 
-const { handleGMapURL } = commonFn
+const { handleGMapURL, getCalculateDistance } = commonFn
 
 type TCenters = TCenter & {
   centerPhone: number;
-  services: TServiceSkeleton[]
+  services: TServiceSkeleton[];
+  distance: number;
 }
 
 
@@ -78,6 +79,28 @@ const usePublicCenterList = () => {
   useLayoutEffect(() => {
     checkLocationPermission();
   }, [])
+
+  useEffect(() => {
+    if (centerList.centerList?.length > 0) {
+      const updatedFilteredList = centerList.centerList.map(center => {
+        const distance = getCalculateDistance(
+          defaultData.lat,
+          defaultData.long,
+          center.centerGeoLocation?.lat || 0,
+          center.centerGeoLocation?.long || 0
+        );
+
+        return {
+          ...center,
+          distance,
+        };
+      });
+
+      startTransition(() => {
+        setFilteredList(updatedFilteredList);
+      });
+    }
+  }, [centerList, defaultData]);
 
   // Check Location Permission Access
   async function checkLocationPermission(): Promise<void> {

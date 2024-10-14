@@ -148,7 +148,7 @@ export const UserProvider = ({ children }: {children: React.ReactNode}) => {
             })
         }
         if(hasTransition){
-            window.location.href = '../services';
+            window.location.href = '../bookings';
         }
     }
 

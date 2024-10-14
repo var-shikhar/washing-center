@@ -22,7 +22,7 @@ const CustomDialog = ({ isOpen, setISOpen, title, contentNode, hasTrigger = fals
                 {triggerNode}
             </DialogTrigger>
         }
-        <DialogContent className={`sm:max-w-[${customWidth}] ${className}`} isPreventEsc={isPrevantEsc} isPreventOutsideClick={isPreventOutsideClick}>
+        <DialogContent className={`w-[90vw] sm:max-w-[${customWidth}] ${className}`} isPreventEsc={isPrevantEsc} isPreventOutsideClick={isPreventOutsideClick}>
             <DialogHeader>
                 <DialogTitle>{title}</DialogTitle>
             </DialogHeader> 

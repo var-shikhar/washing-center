@@ -69,7 +69,7 @@ export default function useSideLinks () {
       icon: <IconBuildingWarehouse size={18} />,
     },
     {
-      title: 'Center List',
+      title: 'Find More Centers',
       label: '',
       href: '/',
       icon: <IconLayoutDashboard size={18} />,

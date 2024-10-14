@@ -1,3 +1,4 @@
+import { useUserContext } from '@/context/userContext';
 import useAxioRequests from '@/lib/axioRequest';
 import { TCenter, TService } from '@/lib/commonTypes';
 import ROUTES from '@/lib/routes';
@@ -6,10 +7,9 @@ import { startTransition, useEffect, useState } from 'react';
 
 const usePublicServiceList = (centerID: string) => {
     const { HandleGetRequest } = useAxioRequests();
+    const { isLoggedIn } = useUserContext();
 
     const [loading, setLoading] = useState(true);
-    const [isSticky, setIsSticky] = useState(false);
-
     const [centerData, setCenterData] = useState<TCenter>({} as TCenter)
     const [serviceList, setServiceList] = useState<TService[]>([] as TService[]);
     const [filteredList, setFilteredList] = useState<TService[]>([] as TService[]);
@@ -26,7 +26,7 @@ const usePublicServiceList = (centerID: string) => {
         async function handleGetQueryRequest(route: string){
             const response = await HandleGetRequest({ route: route });
             if(response?.status === 200){
-                const { centerID, centerName, centerPhone, centerEmail, centerTiming, centerAddress, centerAbbreviation, centerGeoLocation, serviceList } = response.data;
+                const { centerID, centerName, centerPhone, centerEmail, centerTiming, centerAddress, centerAbbreviation, centerGeoLocation, serviceList, todaysCount } = response.data;
                 startTransition(() => {
                     setLoading(false);
                     setCenterData({
@@ -36,6 +36,7 @@ const usePublicServiceList = (centerID: string) => {
                         centerAddress: centerAddress,
                         centerPhone: centerPhone,
                         centerEmail: centerEmail,
+                        todaysCount: todaysCount,
                         centerTiming: {
                             edTime: centerTiming.edTime,
                             stTime: centerTiming.stTime,
@@ -43,7 +44,7 @@ const usePublicServiceList = (centerID: string) => {
                         centerGeoLocation: {
                             lat: centerGeoLocation.lat,
                             long: centerGeoLocation.long
-                        }
+                        },
                     });
                     setServiceList(serviceList);
                 })
@@ -52,6 +53,24 @@ const usePublicServiceList = (centerID: string) => {
 
         if(loading && centerID !== '') handleGetQueryRequest(`${ROUTES.publicServiceListRoute}/${centerID}`)
     }, [loading, centerID])
+
+    useEffect(() => {
+        const tempSelectedOption = sessionStorage.getItem('selectedService');
+        const tempSelectedCenter = sessionStorage.getItem('selectedCenter');
+    
+        if(centerData.centerID){
+            if(isLoggedIn && tempSelectedOption && tempSelectedCenter === centerData.centerID){
+                const parsedSelectedItem = JSON.parse(tempSelectedOption);
+
+                startTransition(() => {
+                    setDialogToggle(true);
+                    setDialogData(parsedSelectedItem);
+                    sessionStorage.removeItem('selectedCenter')
+                    sessionStorage.removeItem('selectedService')
+                })
+            }
+        }
+    }, [centerData.centerID])
 
     useEffect(() => {
         let tempList = serviceList;
@@ -66,19 +85,7 @@ const usePublicServiceList = (centerID: string) => {
             setFilteredList(tempList)
         })
     }, [serviceList, searchedText])
-    
-    const handleScroll = () => {
-        const sticky = 50;
-        setIsSticky(window.scrollY > sticky);
-    };
-
-    useEffect(() => {
-        window.addEventListener('scroll', handleScroll);
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
-    }, []);
-
+  
     // Handle Booking
     function handleBookingToggle(){
         startTransition(() => {
@@ -87,8 +94,17 @@ const usePublicServiceList = (centerID: string) => {
         })
     }
 
+    // Handle Service Selection
+    function handleServiceSelection(service: TService){
+        startTransition(() => {
+            setDialogToggle(true);
+            setDialogData(service);
+            sessionStorage.setItem('selectedCenter', centerData.centerID)
+            sessionStorage.setItem('selectedService', JSON.stringify(service))
+        })
+    }
+
     return {
-        isSticky,
         centerData,
         filteredList,
         searchedText, 
@@ -103,7 +119,8 @@ const usePublicServiceList = (centerID: string) => {
         setDialogData,
         setDialogToggle,
         setSearchedText,
-        handleBookingToggle
+        handleBookingToggle,
+        handleServiceSelection
     }
 }
 

@@ -7,9 +7,9 @@ const AboutPage = () => {
   return (
     <>
       <Header activeHeader="Home" />
-      <section className="header relative pt-16 items-center flex h-screen max-h-860-px">
+      <section className="header relative text-center sm:text-left sm:pt-16 items-center flex h-screen max-h-860-px">
         <div className="container mx-auto items-center flex flex-wrap">
-          <div className="w-full md:w-8/12 lg:w-6/12 xl:w-6/12 px-4">
+          <div className="w-full md:w-8/12 lg:w-6/12 xl:w-6/12">
             <div className="">
               <h2 className="font-semibold text-5xl">
                 Transform Your Washing Center Experience!
@@ -44,12 +44,12 @@ const AboutPage = () => {
             <polygon className="fill-current" points="2560 0 2560 100 0 100" ></polygon>
           </svg>
         </div>
-        <div className="bg-[--deep-purple] border-0 text-white py-10 text-5xl text-center -mt-1">Transform Your Washing Center with Our Digital Platform</div>
+        <div className="bg-[--deep-purple] border-0 text-white py-10 text-3xl sm:text-5xl text-center -mt-1">Transform Your Washing Center with Our Digital Platform</div>
       </section>
       <section className="relative">
         <div className="container mx-auto my-10">
           <div className="flex flex-wrap items-center">
-            <div className="w-10/12 md:w-6/12 lg:w-4/12 px-12 md:px-4 mr-auto ml-auto">
+            <div className="w-full md:w-6/12 lg:w-4/12 sm:px-12 md:px-4 mx-auto">
               <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-blueGray-700">
                 <img
                   alt="..."
@@ -80,58 +80,26 @@ const AboutPage = () => {
 
             <div className="w-full md:w-6/12 px-4">
               <div className="flex flex-wrap">
-                <div className="w-full md:w-6/12 px-4">
-                  <div className="relative flex flex-col mt-4">
-                    <div className="px-4 py-5 flex-auto">
-                      <div className=" p-1 text-center inline-flex items-center justify-center w-20 h-20 mb-5 shadow-lg rounded-full bg-white">
-                        <img src="/assets/onboarding.png" alt="user-friendly-interface" className="w-[100%]" /> 
-                      </div>
-                      <h6 className="text-xl mb-1 font-semibold">
-                        Easy Setup
-                      </h6>
-                      <p className="mb-4 ">
-                        Opening your virtual washing center is a breeze! Our intuitive onboarding process allows you to set up your center in minutes. No technical expertise is required!
-                      </p>
-                    </div>
-                  </div>
-                  <div className="relative flex flex-col min-w-0">
-                    <div className="px-4 py-5 flex-auto"> 
-                      <div className=" p-1 text-center inline-flex items-center justify-center w-20 h-20 mb-5 shadow-lg rounded-full bg-white">
-                        <img src="/assets/booking-2.png" alt="user-friendly-interface" className="w-[100%]" /> 
-                      </div>
-                      <h6 className="text-xl mb-1 font-semibold">
-                        Streamlined Booking Management
-                      </h6>
-                      <p className="mb-4 ">
-                        Say goodbye to missed appointments! Our portal enables you to accept, manage, and track bookings seamlessly, ensuring you never lose a customer again.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-                <div className="w-full md:w-6/12 px-4">
-                  <div className="relative flex flex-col min-w-0 mt-4">
-                    <div className="px-4 py-5 flex-auto">
-                      <div className=" p-1 text-center inline-flex items-center justify-center w-20 h-20 mb-5 shadow-lg rounded-full bg-white">
-                        <img src="/assets/engagement.png" alt="user-friendly-interface" className="w-[100%]" /> 
-                      </div>
-                      <h6 className="text-xl mb-1 font-semibold">Customer Engagement</h6>
-                      <p className="mb-4 ">
-                        Engage with your customers through our platform. Send notifications, reminders, and promotional offers to keep them coming back!
-                      </p>
-                    </div>
-                  </div>
-                  <div className="relative flex flex-col min-w-0">
-                    <div className="px-4 py-5 flex-auto">
-                      <div className=" p-1 text-center inline-flex items-center justify-center w-20 h-20 mb-5 shadow-lg rounded-full bg-white">
-                        <img src="/assets/dashboard.png" alt="user-friendly-interface" className="w-[100%]" /> 
-                      </div>
-                      <h6 className="text-xl mb-1 font-semibold">Comprehensive Dashboard</h6>
-                      <p className="mb-4 ">
-                        Gain valuable insights into your center's performance with our analytics dashboard. Track bookings, revenue, and customer feedback, and make data-driven decisions to grow your business.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <DetailCard 
+                  imageURL="/assets/onboarding.png"
+                  title="Easy Setup"
+                  description="Opening your virtual washing center is a breeze! Our intuitive onboarding process allows you to set up your center in minutes. No technical expertise is required!" 
+                />
+                <DetailCard 
+                  imageURL="/assets/booking-2.png"
+                  title="Streamlined Booking Management"
+                  description="Say goodbye to missed appointments! Our portal enables you to accept, manage, and track bookings seamlessly, ensuring you never lose a customer again." 
+                />
+                <DetailCard 
+                  imageURL="/assets/engagement.png"
+                  title="Customer Engagement"
+                  description="Engage with your customers through our platform. Send notifications, reminders, and promotional offers to keep them coming back!" 
+                />
+                <DetailCard 
+                  imageURL="/assets/dashboard.png"
+                  title="Comprehensive Dashboard"
+                  description="Gain valuable insights into your center's performance with our analytics dashboard. Track bookings, revenue, and customer feedback, and make data-driven decisions to grow your business." 
+                />
               </div>
             </div>
           </div>
@@ -151,69 +119,37 @@ const AboutPage = () => {
             <polygon className="fill-current" points="2560 0 2560 100 0 100" ></polygon>
           </svg>
         </div>
-        <div className="bg-[--deep-purple] border-0 text-white py-10 text-5xl text-center -mt-1">Book Your Wash, On Your Terms.</div>
+        <div className="bg-[--deep-purple] border-0 text-white py-10 text-3xl sm:text-5xl text-center -mt-1">Book Your Wash, On Your Terms.</div>
       </section>
       <section className="relative">
         <div className="container mx-auto my-16">
           <div className="flex flex-wrap items-center">
-          <div className="w-full md:w-6/12 px-4">
+            <div className="w-full md:w-6/12 px-4">
               <div className="flex flex-wrap">
-                <div className="w-full md:w-6/12 px-4">
-                  <div className="relative flex flex-col mt-4">
-                    <div className="px-4 py-5 flex-auto">
-                      <div className=" p-1 text-center inline-flex items-center justify-center w-20 h-20 mb-5 shadow-lg rounded-full bg-white">
-                        <img src="/assets/interface.png" alt="user-friendly-interface" className="w-[100%]" /> 
-                      </div>
-                      <h6 className="text-xl mb-1 font-semibold">
-                        User-Friendly Interface
-                      </h6>
-                      <p className="mb-4 ">
-                        Designed for ease of use, so you can focus on your customers, not the technology.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="relative flex flex-col min-w-0">
-                    <div className="px-4 py-5 flex-auto">
-                      <div className=" p-1 text-center inline-flex items-center justify-center w-20 h-20 mb-5 shadow-lg rounded-full bg-white">
-                        <img src="/assets/booking-1.png" alt="user-friendly-interface" className="w-[100%]" /> 
-                      </div>
-                      <h6 className="text-xl mb-1 font-semibold">
-                        Flexible Booking Options
-                      </h6>
-                      <p className="mb-4 ">
-                        Allow customers to choose from a variety of services at their convenience.
-                      </p>
-                    </div>
-                  </div>
-                </div> 
-                <div className="w-full md:w-6/12 px-4">
-                  <div className="relative flex flex-col min-w-0 mt-4">
-                    <div className="px-4 py-5 flex-auto">
-                      <div className=" p-1 text-center inline-flex items-center justify-center w-20 h-20 mb-5 shadow-lg rounded-full bg-white">
-                        <img src="/assets/profile.png" alt="user-friendly-interface" className="w-[100%]" /> 
-                      </div>
-                      <h6 className="text-xl mb-1 font-semibold">Customizable Profiles</h6>
-                      <p className="mb-4 ">
-                        Showcase your washing center with images, descriptions, and services offered to attract more customers.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="relative flex flex-col min-w-0">
-                    <div className="px-4 py-5 flex-auto">
-                      <div className=" p-1 text-center inline-flex items-center justify-center w-20 h-20 mb-5 shadow-lg rounded-full bg-white">
-                        <img src="/assets/rating.png" alt="user-friendly-interface" className="w-[100%]" /> 
-                      </div>
-                      <h6 className="text-xl mb-1 font-semibold">Customer Reviews & Ratings</h6>
-                      <p className="mb-4 ">
-                        Build trust and improve your services with feedback from your valued customers.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+                <DetailCard 
+                  imageURL="/assets/interface.png"
+                  title="User-Friendly Interface"
+                  description="Designed for ease of use, so you can focus on your customers, not the technology." 
+                />
+                <DetailCard 
+                  imageURL="/assets/booking-1.png"
+                  title="Flexible Booking Options"
+                  description="Allow customers to choose from a variety of services at their convenience." 
+                />
+                <DetailCard 
+                  imageURL="/assets/profile.png"
+                  title="Customizable Profiles"
+                  description="Showcase your washing center with images, descriptions, and services offered to attract more customers." 
+                />
+                <DetailCard 
+                  imageURL="/assets/rating.png"
+                  title="Customer Reviews & Ratings"
+                  description="Build trust and improve your services with feedback from your valued customers." 
+                />
               </div>
             </div>
 
-            <div className="w-10/12 md:w-6/12 lg:w-4/12 px-12 md:px-4 mr-auto ml-auto">
+            <div className="w-full md:w-6/12 lg:w-4/12 sm:px-12 md:px-4 mx-auto">
               <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-blueGray-700">
                 <img
                   alt="..."
@@ -244,8 +180,8 @@ const AboutPage = () => {
           </div>
         </div>
       </section>
-      <section className="relative bg-[--deep-purple] p-16">
-        <div className="container mx-auto sm:px-28">
+      <section className="relative bg-[--deep-purple] p-3 sm:p-16">
+        <div className="sm:container mx-auto sm:px-28">
           <div className="flex flex-wrap justify-center bg-white shadow-xl rounded-lg py-16 px-12 relative z-10">
             <div className="w-full text-center lg:w-8/12">
               <p className="text-4xl text-center">
@@ -270,6 +206,18 @@ const AboutPage = () => {
       </section>
       <Footer />
       </>
+  )
+}
+
+const DetailCard = ({imageURL, title, description}: {imageURL: string, title: string, description: string}) => {
+  return (
+    <div className="relative flex flex-col mt-4 text-center items-center sm:items-start sm:text-start px-4 py-5 flex-auto sm:w-[50%]">
+      <div className=" p-1 text-center inline-flex items-center justify-center w-20 h-20 mb-5 shadow-lg rounded-full bg-white">
+        <img src={imageURL} alt={title} className="w-[100%]" /> 
+      </div>
+      <h6 className="text-xl mb-1 font-semibold">{title}</h6>
+      <p className="mb-4 ">{description}</p>
+    </div>
   )
 }
 
