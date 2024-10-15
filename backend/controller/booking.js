@@ -254,6 +254,8 @@ const getPublicBookingDetail = async (req, res) => {
     }
 }
 
+
+
 // Admin Booking Controller
 const getBookingAPIData = async (req, res) => {
     try {
@@ -294,7 +296,8 @@ const getBookingList = async (req, res) => {
             select: 'name'
             })
             .sort({ createdAt: -1 });
-    
+
+
         const bookingList = (foundBookings || []).map(item => {
             return {
                 id: item._id,
@@ -308,6 +311,7 @@ const getBookingList = async (req, res) => {
                 serviceID: item.serviceID?.serviceID?._id,
                 serviceName: item.serviceID?.serviceID?.name || 'Unknown Service',
                 isRescheduled: item.isReschedules || false,
+                createdAt:  item.createdAt,
                 addonList: item.serviceAddons?.map(addon => {
                     if (addon.addonID) { 
                         return {

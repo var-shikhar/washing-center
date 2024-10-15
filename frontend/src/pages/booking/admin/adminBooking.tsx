@@ -7,15 +7,12 @@ import { Separator } from '@/components/ui/separator'
 import { UserNav } from '@/components/user-nav'
 import { Layout } from '@/context/layout'
 import useAdminBooking from '@/hooks/booking/use-admin-booking'
-import CONSTANT from '@/lib/constant'
 import BackendBookingForm from './component/backendBookingForm'
 import BookingList from './component/bookingList'
 
-const { sortingList } = CONSTANT;
-
 
 export default function AdminBookingPanel() {
-  const { filteredList,  modalToggle,  selectedSort, setModalToggle, setSearchTerm, searchTerm, setSelectedSort, modalData, setModalData, apiData, handleConfirmation, selectedService, setSelectedService } = useAdminBooking();
+  const { filteredList,  modalToggle,  setModalToggle, setSearchTerm, searchTerm, modalData, setModalData, apiData, handleConfirmation, selectedService, setSelectedService } = useAdminBooking();
 
   function handleCenterForm(id: string, title: string){
     setModalToggle(true);
@@ -49,15 +46,6 @@ export default function AdminBookingPanel() {
               className='h-9 w-40 lg:w-[250px]'
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <FilterSelect
-              list={sortingList}
-              onChange={(value: string) => setSelectedSort(value)}
-              selectedValue={selectedSort}
-              slug={{
-                label: 'label',
-                value: 'value'
-              }}
             />
             <FilterSelect
               list={apiData}

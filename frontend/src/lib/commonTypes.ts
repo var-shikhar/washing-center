@@ -67,7 +67,7 @@ export type TBookingList = {
     id: string;
     clientName: string;
     clientNumber: string;
-    appointmentDate: Date,
+    appointmentDate: string,
     appointmentTime: string;
     isRescheduled: boolean;
     message: string;
@@ -79,4 +79,5 @@ export type TBookingList = {
     }[];
     totalAmount: number;
     status: string;
+    createdAt: string,
 }

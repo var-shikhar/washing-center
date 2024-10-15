@@ -18,7 +18,6 @@ const useAdminBooking = () => {
     });
 
     
-    const [selectedSort, setSelectedSort] = useState('ascending');
     const [selectedService, setSelectedService] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
 
@@ -38,7 +37,7 @@ const useAdminBooking = () => {
     // Filter the Service List Items
     useEffect(() => {
         if(bookingList?.length > 0){
-            let tempList = bookingList.sort((a, b) => selectedSort === 'ascending' ? a.clientName?.localeCompare(b.clientName) : b.clientName.localeCompare(a.clientName))
+            let tempList = bookingList;
             if(searchTerm !== '') tempList = tempList.filter(booking => booking.clientName.toLowerCase().includes(searchTerm.toLowerCase()));
 
             if(selectedService !== '') tempList = tempList.filter(booking => booking.serviceID.toString().toLowerCase() === selectedService.toString().toLowerCase())
@@ -47,18 +46,32 @@ const useAdminBooking = () => {
             })
         }
 
-    }, [selectedSort, searchTerm, selectedService, bookingList])
+    }, [searchTerm, selectedService, bookingList])
 
     // Handle Get Requests
-    async function handleGetQueryRequest(route: string, mode: string){
+    async function handleGetQueryRequest(route: string, mode: string) {
         const response = await HandleGetRequest({ route: route });
-        if(response?.status === 200){
+        if (response?.status === 200) {
             startTransition(() => {
-                setLoading(prev => ({...prev, [mode]: false}));
-                mode === 'apiData' ? setAPIData(response.data) : setBookingList(response.data);
-            })
+                setLoading(prev => ({ ...prev, [mode]: false }));
+    
+                if (mode === 'apiData') {
+                    setAPIData(response.data);
+                } else {
+                    const tempBookingList: TBookingList[] = response.data;
+                    const sortedData = tempBookingList.sort((a, b) => {
+                        const dateA = new Date(a.createdAt);
+                        const dateB = new Date(b.createdAt);
+                        return dateB.getTime() - dateA.getTime();
+                    });
+    
+                    console.log(sortedData)
+                    setBookingList(sortedData);
+                }
+            });
         }
     }
+    
 
     // Handle Confirmation
     function handleConfirmation(){
@@ -72,8 +85,6 @@ const useAdminBooking = () => {
         apiData,
         modalToggle,
         setModalToggle,
-        selectedSort,
-        setSelectedSort,
         selectedService,
         setSelectedService,
         searchTerm, 

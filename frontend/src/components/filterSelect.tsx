@@ -1,5 +1,4 @@
 import { IconAdjustmentsHorizontal } from '@tabler/icons-react';
-import { useEffect } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 
 type TFilterSelectProps<T extends Record<string, string>> = {
@@ -20,10 +19,6 @@ const FilterSelect = <T extends Record<string, string>>({
 }: TFilterSelectProps<T>) => {
 
     const value = list.find(item => item[slug.value] === selectedValue) ?? null;
-
-    useEffect(() => {
-        console.log(value)
-    }, [value])
     return (
         <div>
             <Select value={selectedValue} onValueChange={onChange}>

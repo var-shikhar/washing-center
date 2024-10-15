@@ -196,7 +196,7 @@ const centerAdminRoutes = [
       {
         path: 'team',
         lazy: async () => ({
-          Component: (await import('@/pages/center/center.tsx')).default,
+          Component: (await import('@/components/coming-soon.tsx')).default,
         }),
       },
     ],

@@ -1,5 +1,5 @@
-// const BACKEND_ROUTE  = 'http://localhost:8080';
-const BACKEND_ROUTE = 'https://washing-backend-783823846790.asia-east1.run.app';
+const BACKEND_ROUTE  = 'http://localhost:8080';
+// const BACKEND_ROUTE = 'https://washing-backend-783823846790.asia-east1.run.app';
 
 // Auth Routes
 const commonRegisterRoute = `${BACKEND_ROUTE}/auth/register`;

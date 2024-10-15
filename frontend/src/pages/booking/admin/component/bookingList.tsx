@@ -69,15 +69,19 @@ const BookingList = ({list, handleConfirmation}: TBookingListProps) => {
                 {item.isRescheduled && <div className='absolute top-0 left-0 rounded-r-sm px-3 text-sm font-semibold bg-red-300 text-red-600'>Rescheduled</div>}
                 {index + 1}
               </td>
-              <td className="py-4">{item.id}</td>
+              <td className="py-4">
+                <div> {item.id} <br /> {new Date(item.createdAt).toLocaleDateString('en-GB', {day: '2-digit', month: 'short', year: '2-digit', hour: '2-digit', minute: '2-digit', hour12: true})}</div>
+              </td>
               <td className="py-4 text-center">{item.clientName}<br /> <small>{item.clientNumber}</small></td>
               <td className="py-4 text-center">
-                {new Date(item.appointmentDate).toLocaleDateString('en-GB')} <br />
-                {new Date(`1970-01-01T${item.appointmentTime}`).toLocaleTimeString('en-US', {
-                    hour: 'numeric',
-                    minute: 'numeric',
-                    hour12: true
-                })}
+                <div>
+                  {new Date(item.appointmentDate).toLocaleDateString('en-GB')} <br />
+                  {new Date(`1970-01-01T${item.appointmentTime}`).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true
+                  })}
+                </div>
               </td>
               <td className="py-4 text-center">{item.serviceName}</td>
               <td className="py-4 text-center">₹ {item.totalAmount}/-</td>

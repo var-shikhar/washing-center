@@ -8,7 +8,7 @@ const LandingPage = () => {
   return (
     <>
       <Header activeHeader="Home" />
-      <section className="bg-[--deep-purple] py-24 pt-36">
+      <section className="bg-[--deep-purple] py-24 pt-36 relative">
         <div className="container">
           <div className="border-0 text-white text-4xl text-center">Book your next Car/Bike Washing Service Online</div>
         </div>
