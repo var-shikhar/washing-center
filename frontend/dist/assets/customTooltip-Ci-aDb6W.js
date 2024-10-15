@@ -1,0 +1,1 @@
+import{j as o}from"./index-SPzxwvR_.js";import{T as t,a as e,b as l,c as a}from"./tooltip-WHQoM8es.js";const d=({content:r,trigger:i,isTextOnly:s=!0})=>o.jsx(t,{children:o.jsxs(e,{delayDuration:200,children:[o.jsx(l,{asChild:!0,children:i}),o.jsx(a,{children:s?o.jsx("p",{children:r}):r})]})});export{d as C};
