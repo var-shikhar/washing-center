@@ -62,13 +62,11 @@ const usePublicCenterList = () => {
   const [centerList, setCenterList] = useState<TCenterListType>({} as TCenterListType);
   const [filteredList, setFilteredList] = useState<TCenters[]>([] as TCenters[]);
 
-
   const [selectedValues, setSelectedValues] = useState({
     vehicleType: new Set<string>(),
     category: new Set<string>(),
     service: new Set<string>(),
   });
-  
   
   const [defaultData, setDefaultData] = useState({
     lat: 0,
@@ -96,12 +94,13 @@ const usePublicCenterList = () => {
         };
       });
 
+
       startTransition(() => {
         setFilteredList(updatedFilteredList);
       });
     }
   }, [centerList, defaultData]);
-
+  
   // Check Location Permission Access
   async function checkLocationPermission(): Promise<void> {
     const permissionStatus = await navigator.permissions.query({ name: 'geolocation' });

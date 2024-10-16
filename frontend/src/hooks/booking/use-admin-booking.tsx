@@ -4,7 +4,7 @@ import { TBackendBookingList, TBookingList, TServiceItem } from '@/lib/commonTyp
 import ROUTES from '@/lib/routes';
 import { startTransition, useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// import io from 'socket.io-client';
+import io from 'socket.io-client';
 
 
 type TBookingOBJ = {
@@ -32,25 +32,25 @@ const useAdminBooking = () => {
     const [bookingOBJ, setBookingOBJ] = useState<TBookingOBJ>({} as TBookingOBJ);
     const [filteredOBJ, setFilteredOBJ] = useState<TBookingOBJ>({} as TBookingOBJ);
 
-    // useEffect(() => {
-    //     const socket = io(ROUTES.BACKEND_ROUTE);
+    useEffect(() => {
+        const socket = io(ROUTES.BACKEND_ROUTE);
         
-    //     const refreshListener = () => {
-    //         console.log('Refresh notification received');
-    //         setLoading(prev => ({ ...prev, bookingList: true }));
-    //     };
+        const refreshListener = () => {
+            const audio = new Audio('/assets/notification.wav');
+            audio.play().catch(error => console.log('Error playing sound:', error))
+            setLoading(prev => ({ ...prev, bookingList: true }));
+        };
     
-    //     if (selectedCenter) {
-    //         socket.emit('joinCenterRoom', selectedCenter);
+        if (selectedCenter) {
+            socket.emit('joinCenterRoom', selectedCenter);
+            socket.on('refreshBookings', refreshListener);
+        }
     
-    //         socket.on('refreshBookings', refreshListener);
-    //     }
-    
-    //     return () => {
-    //         socket.off('refreshBookings', refreshListener);
-    //         socket.disconnect();
-    //     };
-    // }, [selectedCenter]);
+        return () => {
+            socket.off('refreshBookings', refreshListener);
+            socket.disconnect();
+        };
+    }, [selectedCenter]);
     
 
     useLayoutEffect(() => {

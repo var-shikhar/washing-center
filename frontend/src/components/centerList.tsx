@@ -15,6 +15,7 @@ import { Link } from 'react-router-dom';
 
 const PublicCenterList = () => {
   const { radiusCircle, defaultData, centerList, filteredList, selectedValues, handleSelectionChange, handleRadiusCircle, handleGMapURL } = usePublicCenterList();
+
   return (
     <>
       <section className="relative my-8">

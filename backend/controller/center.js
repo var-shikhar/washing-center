@@ -454,6 +454,7 @@ const getPublicCenterList = async (req, res) => {
             centerList: centerList
         }
 
+
         return res.status(RouteCode.SUCCESS.statusCode).json(finalData);
     } catch (err) {
         console.error(err);

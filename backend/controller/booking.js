@@ -145,9 +145,7 @@ const postPublicServiceBooking = async (req, res) => {
         await handleBookingCreation(foundCenter.name, userName, foundUser.email, userPhone, serviceNameList, newBooking._id, bookingDate, bookingTime, message) 
 
         // Invoke auto refresh event on frontend
-        console.log(`Emitting refreshBookings event to room: ${foundCenter._id}`);
-        io.to(foundCenter._id).emit('refreshBookings');
-
+        io.to(centerID).emit('refreshBookings');
         res.status(RouteCode.SUCCESS.statusCode).json(newBooking._id)        
     } catch(err){
         console.error(err);
