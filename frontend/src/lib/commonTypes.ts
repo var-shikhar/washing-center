@@ -81,3 +81,20 @@ export type TBookingList = {
     status: string;
     createdAt: string,
 }
+
+export type TBackendBookingList = {
+    id: string;
+    appointmentDate: string,
+    appointmentTime: string;
+    isRescheduled: boolean;
+    vehicleNo: string;
+    serviceID: string;
+    serviceName: string;
+    addonList: {
+        addonID: string;
+        addonName: string;
+    }[];
+    totalAmount: number;
+    status: string;
+    createdAt: string,
+}

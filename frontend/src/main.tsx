@@ -33,7 +33,7 @@ const RoutesWrapper = () => {
 const App = () => {
   return (
     <React.StrictMode>
-      <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
+      <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
         <LoaderProvider>
           <UserProvider>
             <Loader />

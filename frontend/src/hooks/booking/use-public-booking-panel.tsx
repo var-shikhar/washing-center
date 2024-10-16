@@ -29,7 +29,7 @@ const usePublicBookingPanel = () => {
     // Filter the Service List Items
     useEffect(() => {
         if(bookingList?.length > 0){
-            let tempList = bookingList.sort((a, b) => selectedSort === 'ascending' ? a.clientName?.localeCompare(b.clientName) : b.clientName.localeCompare(a.clientName))
+            let tempList = bookingList;
             if(searchTerm !== '') tempList = tempList.filter(booking => booking.id.toLowerCase().includes(searchTerm.toLowerCase()));
 
             startTransition(() => {

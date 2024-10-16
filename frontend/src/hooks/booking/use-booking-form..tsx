@@ -5,15 +5,6 @@ import ROUTES from '@/lib/routes';
 import { startTransition, useEffect, useLayoutEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-type TDefaultValues = {
-    userName: string;
-    userPhone: string;
-    userEmail: string;
-    bookingDate: string;
-    bookingTime: string;
-    message: string;
-}
-
 type TServicePricing = {
     serviceID: string;
     centerID: string;
@@ -26,6 +17,7 @@ type TServicePricing = {
     isCustomizable: boolean;
     totalPrice: number;
     totalDiscountedPrice: number;
+    vehicleNo: string;
 }
 
 const useBackendServiceBookingForm = () => {
@@ -39,15 +31,6 @@ const useBackendServiceBookingForm = () => {
     const [selectedPhase, setSelectedPhase] = useState(0);
     const [selectedService, setSelectedService] = useState<TService | null>(null);
 
-    const defaultValues: TDefaultValues = {
-        userName: '',
-        userEmail: '',
-        userPhone: '',
-        bookingDate: new Date().toISOString().split('T')[0],
-        bookingTime: new Date().toTimeString().split(' ')[0],
-        message: 'Backend Booking Request',
-    };
-
     const [servicePricing, setServicePricing] = useState<TServicePricing>({
         serviceID: selectedService?.id ?? '',
         centerID: selectedCenter ?? '',
@@ -56,6 +39,7 @@ const useBackendServiceBookingForm = () => {
         isCustomizable: selectedService?.isCustomizable ?? false,
         totalDiscountedPrice: selectedService?.totalDiscountedPrice ?? selectedService?.discPrice ?? 0,
         totalPrice: selectedService?.totalPrice ?? selectedService?.price ?? 0,
+        vehicleNo: '',
     })
 
     useLayoutEffect(() => {
@@ -76,7 +60,8 @@ const useBackendServiceBookingForm = () => {
                 serviceAddons: selectedService.addons?.map(item => {return { addonID: item.serviceID, addonPrice: item.price, addonDiscPrice: item.discPrice }}) ?? [],
                 isCustomizable: selectedService.isCustomizable,
                 totalDiscountedPrice: selectedService.totalDiscountedPrice ?? selectedService.discPrice,
-                totalPrice: selectedService.totalPrice ?? selectedService.price
+                totalPrice: selectedService.totalPrice ?? selectedService.price,
+                vehicleNo: '',
             }
 
             startTransition(() => {
@@ -98,10 +83,9 @@ const useBackendServiceBookingForm = () => {
     }
 
     // Handle Booking Form Submission
-    async function handleFormSubmission(data: Record<string, any>, handleConfirmation: (bookingID: string) => void){
-        const finalData = {...data, ...servicePricing};
+    async function handleFormSubmission(handleConfirmation: (bookingID: string) => void){
         const response = await HandlePostRequest({
-            data: finalData,
+            data: servicePricing,
             route: ROUTES.commonAdminServiceBooking, 
             type: 'post',
             toastDescription: `Booking has been created successfully!`,
@@ -165,10 +149,10 @@ const useBackendServiceBookingForm = () => {
     return {
         serviceList,
         selectedService,
-        defaultValues,
         selectedPhase,
         servicePricing,
         setSelectedService,
+        setServicePricing,
         setSelectedPhase,
         handleFormSubmission,
         handleCustomizableAddons,

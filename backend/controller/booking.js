@@ -8,6 +8,7 @@ import Booking from '../modal/booking.js';
 import Center from '../modal/washingCenter.js';
 import Service from '../modal/service.js';
 import ServiceItem from '../modal/serviceItem.js';
+import { io } from '../index.js';
 
 dotenv.config();
 const { RouteCode } = constant;
@@ -122,6 +123,7 @@ const postPublicServiceBooking = async (req, res) => {
             status: 'Pending',
             paymentStatus: 'Unpaid',
             message: message,
+            isPublicBooking: true,
             serviceAddons: serviceAddons ? serviceAddons.map(item => {
                 return { addonID: item.addonID, addonPrice: item.addonDiscPrice };
             }) : []
@@ -141,6 +143,11 @@ const postPublicServiceBooking = async (req, res) => {
 
         serviceNameList = serviceNameList.filter(item => item !== false);
         await handleBookingCreation(foundCenter.name, userName, foundUser.email, userPhone, serviceNameList, newBooking._id, bookingDate, bookingTime, message) 
+
+        // Invoke auto refresh event on frontend
+        console.log(`Emitting refreshBookings event to room: ${foundCenter._id}`);
+        io.to(foundCenter._id).emit('refreshBookings');
+
         res.status(RouteCode.SUCCESS.statusCode).json(newBooking._id)        
     } catch(err){
         console.error(err);
@@ -173,7 +180,7 @@ const getPublicBookingList = async (req, res) => {
                 select: 'name'
                 })
             .sort({ createdAt: -1 });
-    
+
         const bookingList = (foundBookings || []).map(item => {
             return {
                 id: item._id,
@@ -297,9 +304,11 @@ const getBookingList = async (req, res) => {
             })
             .sort({ createdAt: -1 });
 
-
-        const bookingList = (foundBookings || []).map(item => {
-            return {
+        const bookingList = [];
+        const backendBookingList = [];
+    
+        foundBookings.forEach(item => {
+            const bookingObject = {
                 id: item._id,
                 clientName: item.userName || 'Unknown',
                 clientNumber: item.userPhone || 'N/A',
@@ -311,9 +320,9 @@ const getBookingList = async (req, res) => {
                 serviceID: item.serviceID?.serviceID?._id,
                 serviceName: item.serviceID?.serviceID?.name || 'Unknown Service',
                 isRescheduled: item.isReschedules || false,
-                createdAt:  item.createdAt,
+                createdAt: item.createdAt,
                 addonList: item.serviceAddons?.map(addon => {
-                    if (addon.addonID) { 
+                    if (addon.addonID) {
                         return {
                             addonID: addon.addonID._id,
                             addonName: addon.addonID.name,
@@ -321,10 +330,22 @@ const getBookingList = async (req, res) => {
                     }
                     return null;
                 }).filter(Boolean),
+                vehicleNo: item.vehicleNo || 'N/A'
             };
+
+            if (item.isPublicBooking) {
+                bookingList.push(bookingObject);
+            } else {
+                backendBookingList.push(bookingObject);
+            }
         });
 
-        res.status(RouteCode.SUCCESS.statusCode).json(bookingList);
+        const responseObj = {
+            bookingList,
+            backendBookingList
+        };
+
+        res.status(RouteCode.SUCCESS.statusCode).json(responseObj);
     } catch (err) {
         console.error(err);
         res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message });
@@ -438,33 +459,33 @@ const getServiceList = async (req, res) => {
         res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
     }
 }
-async function handleUserCreationthroughAdmin(userEmail, userPhone, userName){
-    let foundUser = await User.findOne({ email: userEmail });
-    if (!foundUser && userPhone) { // Run this when no user found with email
-        foundUser = await User.findOne({ phone: userPhone });
-    }
+// async function handleUserCreationthroughAdmin(userEmail, userPhone, userName){
+//     let foundUser = await User.findOne({ email: userEmail });
+//     if (!foundUser && userPhone) { // Run this when no user found with email
+//         foundUser = await User.findOne({ phone: userPhone });
+//     }
 
-    if (!foundUser) { // Run this when no user found with email and phone
-        const newUser = new User({
-            name: userName,
-            email: userEmail,
-            phone: userPhone,
-            password: 'User@1234',
-            isActive: false,
-            isAdmin: false,
-            isMember: true,
-            isEmailVerified: false,
-            userRole: 'Client',
-        });
-        await newUser.save();
-        return newUser
-    }
+//     if (!foundUser) { // Run this when no user found with email and phone
+//         const newUser = new User({
+//             name: userName,
+//             email: userEmail,
+//             phone: userPhone,
+//             password: 'User@1234',
+//             isActive: false,
+//             isAdmin: false,
+//             isMember: true,
+//             isEmailVerified: false,
+//             userRole: 'Client',
+//         });
+//         await newUser.save();
+//         return newUser
+//     }
 
-    return foundUser;
-}
+//     return foundUser;
+// }
 const postAdminServiceBooking = async (req, res) => {
     const userID = req.user;
-    const { userName, userPhone, userEmail,  bookingDate, bookingTime, message, serviceID, centerID, servicePrice, serviceAddons, isCustomizable, totalDiscountedPrice, totalPrice } = req.body;
+    const { serviceID, centerID, servicePrice, serviceAddons, isCustomizable, totalDiscountedPrice, totalPrice, vehicleNo } = req.body;
     
     try{
         const foundCenter = await Center.findById(centerID);
@@ -472,45 +493,52 @@ const postAdminServiceBooking = async (req, res) => {
         if (!foundAdmin || !foundCenter) {
             return res.status(RouteCode.NOT_FOUND.statusCode).json({message: `${!foundCenter ? 'Center not found' : 'Unauthorized access'}, Try later!`});
         }
-        
-        const foundUser = await handleUserCreationthroughAdmin(userEmail, userPhone, userName);
+
         const newBooking = new Booking({
-            user: foundUser._id,
-            userName: userName,
-            userPhone: userPhone,
+            user: userID,
+            userName: 'Default User',
+            userPhone: '9898989898',
             centerID: centerID,
             serviceID: serviceID,
             servicePrice: servicePrice,
             isCustomizable: isCustomizable,
-            bookingDate: new Date(bookingDate),
-            bookingTime: bookingTime,
+            bookingDate: new Date(),
+            bookingTime: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false }),
             isReschedules: false,
             totalAmount: totalDiscountedPrice,
             discount: 0,
-            status: 'Pending',
+            status: 'Confirmed',
             paymentStatus: 'Unpaid',
-            message: message,
+            message: 'NA',
+            isPublicBooking: false,
+            vehicleNo: vehicleNo,
             serviceAddons: serviceAddons ? serviceAddons.map(item => {
                 return { addonID: item.addonID, addonPrice: item.addonDiscPrice };
             }) : []
         });
-
-        newBooking.bookingLog.push({bookingDate: new Date(bookingDate), bookingTime: bookingTime,})
-        await newBooking.save();
-
-        let serviceNameList = [];
         
-        serviceNameList.push(await getServiceName(serviceID, 'service'));
-        if (serviceAddons) {
-            for (const item of serviceAddons) {
-                serviceNameList.push(await getServiceName(item.addonID, 'addon'));
-            }
+        newBooking.bookingLog.push({bookingDate: new Date(), bookingTime: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false })})
+        await newBooking.save();
+        res.status(RouteCode.SUCCESS.statusCode).json({message: 'New Booking has created successfully!'});        
+    } catch(err){
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
+    }
+}
+const deleteBooking = async (req, res) => {
+    const userID = req.user;
+    const { centerID: bookingID } = req.params;
+    try{
+        const foundAdmin = await User.findById(userID);
+        const foundBooking = await Booking.findById(bookingID);
+        if (!foundAdmin || !foundBooking) {
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({message: `${!foundBooking ? 'Booking not found' : 'Unauthorized access'}, Try later!`});
         }
 
-        serviceNameList = serviceNameList.filter(item => item !== false);
-        await handleBookingCreation(foundCenter.name, userName, foundUser.email, userPhone, serviceNameList, newBooking._id, bookingDate, bookingTime, message) 
-        res.status(RouteCode.SUCCESS.statusCode).json(newBooking._id)        
-    } catch(err){
+
+        await foundBooking.deleteOne();
+        return res.status(RouteCode.SUCCESS.statusCode).json({message: 'Booking has deleted successfully!'})
+    } catch (err) {
         console.error(err);
         res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
     }
@@ -525,5 +553,5 @@ export default {
 
     // Admin Booking
     getBookingAPIData, getBookingList, putRescheduleBooking, putBookingStatusUpdate,
-    getServiceList, postAdminServiceBooking
+    getServiceList, postAdminServiceBooking, deleteBooking
 }

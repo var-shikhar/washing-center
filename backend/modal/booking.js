@@ -86,6 +86,14 @@ const BookingSchema = new mongoose.Schema({
     },
     message: {
         type: String,
+    },
+    isPublicBooking: {
+        type: Boolean,
+        default: false
+    },
+    vehicleNo: {
+        type: String,
+        required: false
     }
 }, { timestamps: true });
 

@@ -1,4 +1,5 @@
-const BACKEND_ROUTE = 'https://washing-backend-783823846790.asia-east1.run.app';
+// const BACKEND_ROUTE = 'https://washing-backend-783823846790.asia-east1.run.app';
+const BACKEND_ROUTE = 'http://localhost:8080';
 
 // Auth Routes
 const commonRegisterRoute = `${BACKEND_ROUTE}/auth/register`;
@@ -35,6 +36,7 @@ const publicCommonServiceBooking = `${BACKEND_ROUTE}/public/service/booking`;
 
 
 const ROUTES = {
+    BACKEND_ROUTE,
     commonRegisterRoute, commonLoginRoute, getLogoutRoute, commonForgotPasswordRoute,
     authCenterRoute, commonCenterRoute,
     getAPIServiceForm, commonServiceRoute, getServiceList,
