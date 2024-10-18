@@ -107,28 +107,30 @@ const BookingList = ({list, handleConfirmation, handleDeletion}: TBookingListPro
                       />
                     }
                   />
-                  <CustomTooltip 
-                    content={'Reschedule Booking Request'} 
-                    trigger={
-                      <IconCalendarClock 
-                        className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' 
-                        size={'25'} 
-                        onClick={() => handleModalToggle(item, 'ReSchedule')}
+                  {item.status !== 'Cancelled' && item.status !== 'Completed' && (
+                    <>
+                      <CustomTooltip 
+                        content={'Reschedule Booking Request'} 
+                        trigger={
+                          <IconCalendarClock 
+                            className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' 
+                            size={'25'} 
+                            onClick={() => handleModalToggle(item, 'ReSchedule')}
+                          />
+                        }
                       />
-                    }
-                  />
-                  {item.status !== 'Cancelled' && item.status !== 'Completed' && 
-                    <CustomTooltip 
-                      content={'Update Booking Status'} 
-                      trigger={
-                        <IconStatusChange 
-                          className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' 
-                          size={'25'} 
-                          onClick={() => handleModalToggle(item, 'Status')}
-                        />
-                      }
-                    />
-                  }
+                      <CustomTooltip 
+                        content={'Update Booking Status'} 
+                        trigger={
+                          <IconStatusChange 
+                            className='cursor-pointer rounded-md border p-1 bg-slate-400 hover:bg-slate-600 transition-all fade-in-100 text-black hover:text-white' 
+                            size={'25'} 
+                            onClick={() => handleModalToggle(item, 'Status')}
+                          />
+                        }
+                      />
+                    </>
+                  )}
                   {item.status === 'Cancelled' && 
                     <CustomTooltip 
                       content={'Delete Booking'} 

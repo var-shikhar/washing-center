@@ -71,7 +71,7 @@ export default function BookingStatusForm({ className, bookingID, prevStatus, ha
                 </div>
 
                 <Button className='mt-2 w-full' type='submit' disabled={!isValid}>
-                    Reschedule Booking
+                    Update Status
                 </Button>
             </form>
         </div>

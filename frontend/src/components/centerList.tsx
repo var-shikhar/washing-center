@@ -10,10 +10,12 @@ import {
 } from "@/components/ui/select";
 import usePublicCenterList, { TFilterTypes } from '@/hooks/public/use-center-list';
 import { IconListDetails, IconMap2 } from '@tabler/icons-react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 
 const PublicCenterList = () => {
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const { radiusCircle, defaultData, centerList, filteredList, selectedValues, handleSelectionChange, handleRadiusCircle, handleGMapURL } = usePublicCenterList();
 
   return (
@@ -66,8 +68,13 @@ const PublicCenterList = () => {
           <div className='mx-2'>
             <div className="flex flex-wrap w-[90vw] sm:w-full mx-auto">
               {filteredList?.length >0 && filteredList.map(item => (
-                <div key={item.centerID} className='relative w-full md:w-1/2 lg:w-1/3 p-2'>
-                  <div className='rounded-lg border p-4 hover:shadow-md flex flex-col gap-2'> 
+                <div key={item.centerID} 
+                className={`relative w-full md:w-1/2 lg:w-1/3 p-2 transition-all delay-200 ${
+                  hoveredCard !== null && hoveredCard !== item.centerID ? 'blur-sm' : ''
+                }`}
+                onMouseEnter={() => setHoveredCard(item.centerID)}
+                onMouseLeave={() => setHoveredCard(null)}>
+                  <div className='rounded-lg border p-4 hover:shadow-2xl hover:scale-105 transition-all delay-100 flex flex-col gap-2'> 
                     <div className='my-2 mt-3 flex items-center gap-2 w-full'>
                       <div className={`flex size-10 items-center justify-center rounded-lg bg-muted p-2 font-bold`}>
                         {item?.centerAbbreviation}
@@ -80,7 +87,7 @@ const PublicCenterList = () => {
                     </p>
                     <p className='line-clamp-2'>
                       <span className='text-muted-foreground'>Distance:</span>
-                      &nbsp;{Number(item?.distance).toFixed(3)} meters
+                      &nbsp;{Number(item?.distance).toFixed(3)} km
                     </p>
                     <small className='line-clamp-2 text-muted-foreground overflow-hidden text-ellipsis whitespace-normal' style={{minHeight: 'calc(2 * 1.2rem)'}}>{item?.centerAddress}</small>
                     <div className='flex gap-2 justify-between'>

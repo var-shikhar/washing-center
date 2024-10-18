@@ -21,6 +21,10 @@ const CenterSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    isLive: {
+        type: Boolean,
+        default: false
+    },
     geoAddress: {
         type: String,
         required: true,

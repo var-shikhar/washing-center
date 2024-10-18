@@ -1,5 +1,5 @@
-const BACKEND_ROUTE = 'https://washing-backend-783823846790.asia-east1.run.app';
-// const BACKEND_ROUTE = 'http://localhost:8080';
+// const BACKEND_ROUTE = 'https://washing-backend-783823846790.asia-east1.run.app';
+const BACKEND_ROUTE = 'http://localhost:8080';
 
 // Auth Routes
 const commonRegisterRoute = `${BACKEND_ROUTE}/auth/register`;
@@ -22,6 +22,11 @@ const commonBookingRoute = `${BACKEND_ROUTE}/admin/booking`;
 const commonBookingRescheduleRoute = `${BACKEND_ROUTE}/admin/booking/reschedule`;
 const commonAdminServiceBooking = `${BACKEND_ROUTE}/admin/booking/service`;
 
+// Dashboard Routes
+const getDashboardData = `${BACKEND_ROUTE}/admin/dashboard-data`;
+
+
+
 
 // Public Routes
 const publicCenterListRoute = `${BACKEND_ROUTE}/public/center/list`;
@@ -41,6 +46,7 @@ const ROUTES = {
     authCenterRoute, commonCenterRoute,
     getAPIServiceForm, commonServiceRoute, getServiceList,
     getAPIBooking, commonBookingRoute, commonBookingRescheduleRoute, commonAdminServiceBooking,
+    getDashboardData,
 
 
     // Public Routes

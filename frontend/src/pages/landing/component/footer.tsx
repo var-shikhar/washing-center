@@ -3,10 +3,10 @@ import { Link } from "react-router-dom"
 const Footer = () => {
     return (
         <div className="relative mt-16 bg-[--deep-purple]">
-            <svg className="absolute top-0 w-full h-6 -mt-5 sm:-mt-10 sm:h-16 " preserveAspectRatio="none" viewBox="0 0 1440 54">
-                <path fill="currentColor" d="M0 22L120 16.7C240 11 480 1.00001 720 0.700012C960 1.00001 1200 11 1320 16.7L1440 22V54H1320C1200 54 960 54 720 54C480 54 240 54 120 54H0V22Z"></path>
+            <svg className="absolute top-0 w-full h-6 -mt-5 sm:-mt-10 sm:h-16" preserveAspectRatio="none" viewBox="0 0 1440 54">
+                <path fill="#00959f" d="M0 22L120 16.7C240 11 480 1.00001 720 0.700012C960 1.00001 1200 11 1320 16.7L1440 22V54H1320C1200 54 960 54 720 54C480 54 240 54 120 54H0V22Z"></path>
             </svg>
-            <div className="px-4 pt-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8 text-slate-500">
+            <div className="px-4 pt-16 mx-auto sm:max-w-xl md:max-w-full lg:max-w-screen-xl md:px-24 lg:px-8">
                 <div className="grid gap-10 row-gap-6 mb-8 sm:grid-cols-2 lg:grid-cols-5">
                     <div className="sm:col-span-2">
                         <a href="/" aria-label="Go home" title="Company" className="inline-flex items-center">
@@ -83,18 +83,19 @@ const Footer = () => {
                 </div>
                 <div className="flex flex-col-reverse justify-between pt-5 pb-10 border-t lg:flex-row">
                     <p className="text-sm ">
-                        © 2024 Washing Center. All rights reserved.
+                        © 2024 All rights reserved. Made with ❤ by <Link to={'https://unnattechnologyservices.com/'} className="text-slate-300">Unnat Technologies Services</Link>.
                     </p>
                     <ul className="flex flex-col mb-3 space-y-2 lg:mb-0 sm:space-y-0 sm:space-x-5 sm:flex-row">
-                    <li>
-                        <a href="/" className="text-sm  transition-colors duration-300 hover:text-slate-300">F.A.Q</a>
-                    </li>
-                    <li>
-                        <a href="/" className="text-sm  transition-colors duration-300 hover:text-slate-300">Privacy Policy</a>
-                    </li>
-                    <li>
-                        <a href="/" className="text-sm  transition-colors duration-300 hover:text-slate-300">Terms &amp; Conditions</a>
-                    </li>
+                        <li>
+                            <Link to={`../privacy-policy`}>
+                                <div className="text-sm transition-colors hover:text-slate-300 duration-300  hover:text-deep-purple-800">Privacy Policy</div>
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to={`../terms-and-condition`}>
+                                <div className="text-sm transition-colors hover:text-slate-300 duration-300  hover:text-deep-purple-800">Terms &amp; Conditions</div>
+                            </Link>
+                        </li>
                     </ul>
                 </div>
             </div>

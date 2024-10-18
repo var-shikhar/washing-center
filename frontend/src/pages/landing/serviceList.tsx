@@ -10,42 +10,45 @@ import { Link, useParams } from 'react-router-dom';
 import BookingForm from './component/bookingForm';
 import Footer from './component/footer';
 import Header from './component/header';
+import { useState } from 'react';
 
 const { handleGMapURL, getTimeinAMPMfromTimeString } = commonFn;
 
 const PublicServiceList = () => {
     const { id }  = useParams();
     const { centerData, filteredList, searchedText, dialogToggle, dialogData, formToggle, confirmationToggle, bookingID, setBookingID, setConfirmationToggle, setFormToggle, setDialogToggle, setSearchedText, handleBookingToggle, handleServiceSelection } = usePublicServiceList(id ?? '');
+    const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+
 
     const ServiceDetail = () => {
         return (
-            <div className='text-slate-700 my-1'>
+            <div className='my-1'>
                 {dialogData.isCustomizable && <div className='bg-red-100 text-red-700 rounded p-2 my-4'>Addons are customizable while booking.</div>}
-                <div className='text-slate-700 mb-3'>{dialogData.serviceDescription}</div>
-                <hr className='border-black' />
-                <div className='text-black font-semibold'>Service Price</div>
-                <hr className='border-black mb-2' />
+                <div className='text-muted-foreground mb-3'>{dialogData.serviceDescription}</div>
+                <hr className='border-[--background]' />
+                <div className='font-semibold'>Service Price</div>
+                <hr className='border-[--background] mb-2' />
                 <div className='flex gap-1 flex-col'>
                     <div className='flex justify-between items-center'>
-                        <div className=''>Base Price</div>
+                        <div className='text-muted-foreground'>Base Price</div>
                         <div className='font-semibold text-green-500'>
-                            <del className='text-destructive text-xs'>₹ {dialogData.price}/-</del> &nbsp; ₹ {dialogData.discPrice}/-
+                            <del className='text-red-500 text-xs'>₹ {dialogData.price}/-</del> &nbsp; ₹ {dialogData.discPrice}/-
                         </div>
                     </div>
                     {dialogData.addons?.map(option => (
                         <div className='flex justify-between items-center' key={option.serviceID}>
-                            <div className='truncate'>{option.serviceName}</div>
+                            <div className='truncate text-muted-foreground'>{option.serviceName}</div>
                             <div className='font-semibold text-green-500'>
-                                <del className='text-destructive text-xs'>₹ {option.price}/-</del> &nbsp; ₹ {option.discPrice}/-
+                                <del className='text-red-500 text-xs'>₹ {option.price}/-</del> &nbsp; ₹ {option.discPrice}/-
                             </div>
                         </div>
                     ))}                    
                 </div>
-                <hr className='border-black my-2' />
+                <hr className='border-[--background] my-2' />
                 <div className='flex justify-between items-center text-lg font-bold'>
-                    <div className='text-black'>Total Price</div>
+                    <div className=''>Total Price</div>
                     <div className='font-semibold text-green-500'>
-                        <del className='text-destructive text-sm'>₹ {dialogData.totalPrice}/-</del> &nbsp; ₹ {dialogData.totalDiscountedPrice}/-
+                        <del className='text-red-500 text-sm'>₹ {dialogData.totalPrice}/-</del> &nbsp; ₹ {dialogData.totalDiscountedPrice}/-
                     </div>
                 </div>
                 <Button className='mx-auto w-[100%] px-6 sm:w-auto block mt-5' type='button' onClick={handleBookingToggle}>Book Service</Button>
@@ -53,7 +56,7 @@ const PublicServiceList = () => {
         )
     }
 
-    const BookingConfirmation = ({ bookingID = '' }: {bookingID: string}) => {
+    const BookingConfirmation = ({ bookingID = '', lat = 0, long = 0 }: {bookingID: string, lat: number, long: number}) => {
         return (
             <div className="bg-green-50 text-green-800 p-6 rounded-lg shadow-md max-w-md mx-auto text-center">
                 <div className="flex items-center justify-center mb-4">
@@ -67,6 +70,10 @@ const PublicServiceList = () => {
                 <Link to='../dashboard/my-bookings'>
                     <Button type='button' className='my-2 sm:my-4 bg-green-600 hover:bg-green-800'>Continue</Button>
                 </Link>
+                <Button type='button' className='mx-auto flex gap-2 items-center' variant={'ghost'} onClick={() => handleGMapURL(lat || 0, long || 0)}>
+                    <IconMap2 size={15} />
+                    View Center Direction
+                </Button>
             </div>
         );
     };
@@ -156,8 +163,12 @@ const PublicServiceList = () => {
                     {filteredList?.map(item => (
                         <div 
                             key={item.id} 
-                            className='flex justify-between items-center border rounded p-3 py-5 cursor-pointer relative' 
-                            onClick={() => handleServiceSelection(item)}
+                            className={`flex justify-between items-center border rounded p-3 py-5 cursor-pointer relative transition-all delay-200 hover:scale-105 ${
+                                hoveredCard !== null && hoveredCard !== item.id ? 'blur-sm' : ''
+                              }`}
+                              onMouseEnter={() => setHoveredCard(item.id)}
+                              onMouseLeave={() => setHoveredCard(null)}
+                              onClick={() => handleServiceSelection(item)}
                         >
                             {item.isCustomizable && <div className='absolute text-sm top-0 left-0 rounded-e-md bg-green-800 px-3 text-white'>Customizable Addons</div>}
                             <div className=''>
@@ -170,7 +181,7 @@ const PublicServiceList = () => {
                                 </div>
                             </div>
                             <div className='text-lg font-semibold text-green-500'>
-                                <del className='text-destructive'>₹ {item.price}/-</del> &nbsp; ₹ {item.discPrice}/-
+                                <del className='text-red-500'>₹ {item.price}/-</del> &nbsp; ₹ {item.discPrice}/-
                             </div>
                         </div>
                     ))}
@@ -200,6 +211,7 @@ const PublicServiceList = () => {
                         bookedService={dialogData} 
                         centerID={centerData.centerID} 
                         closingTime={centerData.centerTiming?.edTime ?? '19:00'} 
+                        openingTime={centerData.centerTiming?.stTime ?? '10:00'} 
                         handleConfirmation={(bookingID: string) => {
                             setFormToggle(false)
                             setConfirmationToggle(true)
@@ -216,7 +228,13 @@ const PublicServiceList = () => {
                 isPrevantEsc
                 customWidth='30vw'
                 title={'Booking Received'} 
-                contentNode={<BookingConfirmation bookingID={bookingID} />} 
+                contentNode={
+                    <BookingConfirmation 
+                        bookingID={bookingID} 
+                        lat={centerData.centerGeoLocation?.lat || 0}
+                        long={centerData.centerGeoLocation?.long || 0}
+                    />
+                } 
             />
         </>
     )

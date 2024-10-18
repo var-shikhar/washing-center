@@ -12,8 +12,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { UserNav } from '@/components/user-nav'
 import { Layout } from '@/context/layout'
 import { RecentSales } from './components/recent-sales'
+import useAdminDashboard from '@/hooks/use-admin-dashboard'
 
 export default function Dashboard() {
+  const { dashboardData } = useAdminDashboard();
   return (
     <Layout>
       {/* ===== Top Heading ===== */}
@@ -30,9 +32,6 @@ export default function Dashboard() {
       <Layout.Body>
         <div className='mb-2 flex items-center justify-between space-y-2'>
           <h1 className='text-2xl font-bold tracking-tight'>Dashboard</h1>
-          <div className='flex items-center space-x-2'>
-            <Button>Download</Button>
-          </div>
         </div>
         <Tabs
           orientation='vertical'
@@ -50,7 +49,7 @@ export default function Dashboard() {
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Total Revenue
+                    Daily Revenue
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -66,16 +65,16 @@ export default function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>₹45,231.89</div>
-                  <p className='text-xs text-muted-foreground'>
+                  <div className='text-2xl font-bold'>₹ {dashboardData.dailyAmount}</div>
+                  {/* <p className='text-xs text-muted-foreground'>
                     +20.1% from last month
-                  </p>
+                  </p> */}
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Subscriptions
+                    Weekly Revenue
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -93,15 +92,12 @@ export default function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>+2350</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +180.1% from last month
-                  </p>
+                  <div className='text-2xl font-bold'>₹ {dashboardData.weeklyAmount}</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                  <CardTitle className='text-sm font-medium'>Sales</CardTitle>
+                  <CardTitle className='text-sm font-medium'>Monthly Revenue</CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
                     viewBox='0 0 24 24'
@@ -117,16 +113,13 @@ export default function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>+12,234</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +19% from last month
-                  </p>
+                  <div className='text-2xl font-bold'>₹ {dashboardData.monthlyAmount}</div>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Active Now
+                    Yearly Revenue
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -142,23 +135,20 @@ export default function Dashboard() {
                   </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className='text-2xl font-bold'>+573</div>
-                  <p className='text-xs text-muted-foreground'>
-                    +201 since last hour
-                  </p>
+                  <div className='text-2xl font-bold'>₹ {dashboardData.yearlyAmount}</div>
                 </CardContent>
               </Card>
             </div>
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
               <Card className='col-span-1 lg:col-span-3'>
                 <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
+                  <CardTitle>Recent Bookings</CardTitle>
                   <CardDescription>
-                    You made 3 sales this month.
+                    Recent Booking Requests for washing service
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <RecentSales />
+                  <RecentSales list={dashboardData.bookingList} />
                 </CardContent>
               </Card>
             </div>

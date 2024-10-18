@@ -41,12 +41,12 @@ export default function useSideLinks () {
     },
   ]
   const adminSideLinks: ISideLink[] = [
-    {
-      title: 'Dashboard',
-      label: '',
-      href: '/dashboard',
-      icon: <IconLayoutDashboard size={18} />,
-    },
+    // {
+    //   title: 'Dashboard',
+    //   label: '',
+    //   href: '/dashboard',
+    //   icon: <IconLayoutDashboard size={18} />,
+    // },
     {
       title: 'Center List',
       label: '',

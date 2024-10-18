@@ -1,4 +1,5 @@
 import { Button } from '@/components/custom/button';
+import ThemeSwitch from '@/components/theme-switch';
 import { useUserContext } from '@/context/userContext';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -34,6 +35,7 @@ const Header = ({activeHeader, wrapperClass = ''}: THeaderProps) => {
                             About Us
                         </Button>
                     </Link>
+                    <ThemeSwitch />
                     <div className="hidden lg:flex items-center space-x-4">
                         {isLoggedIn ? 
                             <Link to={`../${userData?.userRole === 'Admin' ? 'bookings' : 'dashboard'}`}>

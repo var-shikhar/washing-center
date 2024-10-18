@@ -77,29 +77,6 @@ const usePublicCenterList = () => {
   useLayoutEffect(() => {
     checkLocationPermission();
   }, [])
-
-  useEffect(() => {
-    if (centerList.centerList?.length > 0) {
-      const updatedFilteredList = centerList.centerList.map(center => {
-        const distance = getCalculateDistance(
-          defaultData.lat,
-          defaultData.long,
-          center.centerGeoLocation?.lat || 0,
-          center.centerGeoLocation?.long || 0
-        );
-
-        return {
-          ...center,
-          distance,
-        };
-      });
-
-
-      startTransition(() => {
-        setFilteredList(updatedFilteredList);
-      });
-    }
-  }, [centerList, defaultData]);
   
   // Check Location Permission Access
   async function checkLocationPermission(): Promise<void> {
@@ -198,11 +175,32 @@ const usePublicCenterList = () => {
   async function handleGetQueryRequest(route: string){
     const response = await HandleGetRequest({ route: route });
     if(response?.status === 200){
+      const {vehicleList, categoryList, serviceList, centerList} = response.data;
+
+      const updatedCenterList = centerList?.length > 0 ? centerList.map((center:TCenters) => {
+        const distance = getCalculateDistance(
+          defaultData.lat,
+          defaultData.long,
+          center.centerGeoLocation?.lat || 0,
+          center.centerGeoLocation?.long || 0
+        );
+
+        return {
+          ...center,
+          distance,
+        };
+      }) : [];
+      
       startTransition(() => {
-        setCenterList(response.data);
-      })
+        setLoading(false);
+        setCenterList({
+          categoryList: categoryList,
+          centerList: updatedCenterList,
+          serviceList: serviceList,
+          vehicleList: vehicleList,
+        });
+      });
     }
-    setLoading(false);
   }
 
 

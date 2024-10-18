@@ -40,7 +40,7 @@ const useServiceBookingForm = ({bookedService, centerID}: {bookedService: TServi
         userName: userData?.userName ?? '',
         userPhone: userData?.userPhone ?? '',
         bookingDate: new Date().toISOString().split('T')[0],
-        bookingTime: new Date().toTimeString().split(' ')[0],
+        bookingTime: '',
         message: 'Booking Request',
     };
 

@@ -36,6 +36,18 @@ const publicRoutes = [
       Component: (await import('./pages/landing/serviceList.tsx')).default,
     }),
   },
+  {
+    path: '/privacy-policy',
+    lazy: async () => ({
+      Component: (await import('./pages/landing/policy.tsx')).default,
+    }),
+  },
+  {
+    path: '/terms-and-condition',
+    lazy: async () => ({
+      Component: (await import('./pages/landing/termsCondition.tsx')).default,
+    }),
+  },
 ]
 const authRoutes = [
   {
@@ -184,7 +196,7 @@ const centerAdminRoutes = [
       {
         path: 'dashboard',
         lazy: async () => ({
-          Component: (await import('./pages/dashboard')).default,
+          Component: (await import('@/pages/center/center.tsx')).default,
         }),
       },
       {

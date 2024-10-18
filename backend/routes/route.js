@@ -30,6 +30,7 @@ router.route('/admin/booking/reschedule').put(isAuth, bookingController.putResch
 router.route('/admin/booking/:centerID?').get(isAuth, bookingController.getBookingList).put(isAuth, bookingController.putBookingStatusUpdate).delete(isAuth, bookingController.deleteBooking);
 router.route('/admin/booking/service/:centerID?').get(isAuth, bookingController.getServiceList).post(isAuth, bookingController.postAdminServiceBooking)
 
+router.route('/admin/dashboard-data/:centerID').get(isAuth, centerController.getCenterDashboardData);
 
 // Public Controller
 router.route('/public/center/list/:lat/:long/:radius').get(centerController.getPublicCenterList);

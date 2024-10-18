@@ -287,6 +287,94 @@ const getAuthCenterList = async (req, res) => {
     }
 }
 
+// Get Center Dashboard Data
+const getCenterDashboardData = async (req, res) => {
+    const userID = req.user;
+    const { centerID } = req.params;
+
+    try {
+        const foundUser = await User.findById(userID);
+        if (!foundUser) {
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({ message: 'Unauthorized access, Try again!' });
+        }
+
+        // Find the center owned by the user
+        const foundCenter = await Center.findById(centerID);
+        if (!foundCenter) {
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({ message: 'Center not found or unauthorized access' });
+        }
+
+        // Calculate time periods for filtering
+        const now = new Date();
+        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const startOfWeek = new Date(now.setDate(now.getDate() - now.getDay()));
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const startOfYear = new Date(now.getFullYear(), 0, 1);
+
+        const bookings = await Booking.find({ centerID: centerID })
+        .populate({
+            path: 'serviceID',
+            populate: {
+                path: 'serviceID',
+                model: 'ServiceItem',
+                select: 'name category vehicle description coverImage'
+            }
+        })
+        .exec();
+
+        let yearlyAmount = 0;
+        let monthlyAmount = 0;
+        let weeklyAmount = 0;
+        let dailyAmount = 0;
+        let bookingList = [];
+
+        // Process bookings
+        bookings.forEach(booking => {
+            const bookingDate = new Date(booking.bookingDate);
+            const amount = booking.totalAmount;
+
+            if(booking.status === 'Completed'){
+                if (bookingDate >= startOfYear) {
+                    yearlyAmount += amount;
+                    if (bookingDate >= startOfMonth) {
+                        monthlyAmount += amount;
+                        if (bookingDate >= startOfWeek) {
+                            weeklyAmount += amount;
+                            if (bookingDate >= startOfDay) {
+                                dailyAmount += amount;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Add booking to the list
+            bookingList.push({
+                id: booking._id,
+                serviceName: booking.serviceID?.serviceID?.name,
+                serviceAmount: booking.totalAmount,
+                serviceType: booking.isPublicBooking,
+                clientName: booking.userName,
+                abbreviation: getNameAbbreviation(booking.userName),
+            });
+        });
+
+        const finalData = {
+            yearlyAmount,
+            monthlyAmount,
+            weeklyAmount,
+            dailyAmount,
+            bookingList: bookingList.splice(0, 3)
+        }
+
+        // Send the response
+        return res.status(RouteCode.SUCCESS.statusCode).json(finalData);
+    } catch (err) {
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message });
+    }
+};
+
 
 // Public Center Controllers
 const getTodaysBookingCount = async (centerID) => {
@@ -402,8 +490,8 @@ const getPublicCenterList = async (req, res) => {
 
     try {
         const foundCenters = (parsedLat === 0 || parsedLong === 0 || parsedRadius === 0)
-            ? await Center.find({isActive: true}).populate() 
-            : await Center.find({isActive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], parsedRadius / 6378.1] }}}).populate();
+            ? await Center.find({isActive: true, isLive: true}).populate() 
+            : await Center.find({isActive: true, isLive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], parsedRadius / 6378.1] }}}).populate();
 
         const vehicleList = await Vehicle.find();  
         const categoryList = await ServiceCategory.find(); 
@@ -465,6 +553,7 @@ const getPublicCenterList = async (req, res) => {
 export default {
     getAuthCenterList, getCenterList,
     postCenterForm, getInitDetails, putCenterDetail, putCenterStatus, deleteCenter,
+    getCenterDashboardData,
 
 
     // Public Controller

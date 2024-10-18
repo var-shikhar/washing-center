@@ -2,6 +2,7 @@ import { Button } from "@/components/custom/button";
 import { Link } from "react-router-dom";
 import Footer from "./component/footer";
 import Header from "./component/header";
+import JoinNowCTA from "./component/joinNowCTA";
 
 const AboutPage = () => {
   return (
@@ -50,7 +51,7 @@ const AboutPage = () => {
         <div className="container mx-auto my-10">
           <div className="flex flex-wrap items-center">
             <div className="w-full md:w-6/12 lg:w-4/12 sm:px-12 md:px-4 mx-auto">
-              <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-blueGray-700">
+              <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-700">
                 <img
                   alt="..."
                   src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=700&q=80"
@@ -65,7 +66,7 @@ const AboutPage = () => {
                   >
                     <polygon
                       points="-30,95 583,95 583,65"
-                      className="text-blueGray-700 fill-current"
+                      className="fill-current"
                     ></polygon>
                   </svg>
                   <h4 className="text-xl font-bold ">
@@ -150,7 +151,7 @@ const AboutPage = () => {
             </div>
 
             <div className="w-full md:w-6/12 lg:w-4/12 sm:px-12 md:px-4 mx-auto">
-              <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-blueGray-700">
+              <div className="relative flex flex-col min-w-0 break-words  w-full mb-6 shadow-lg rounded-lg bg-blueGray-700">
                 <img
                   alt="..."
                   src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=700&q=80"
@@ -165,7 +166,7 @@ const AboutPage = () => {
                   >
                     <polygon
                       points="-30,95 583,95 583,65"
-                      className="text-blueGray-700 fill-current"
+                      className="fill-current"
                     ></polygon>
                   </svg>
                   <h4 className="text-xl font-bold ">
@@ -180,30 +181,7 @@ const AboutPage = () => {
           </div>
         </div>
       </section>
-      <section className="relative bg-[--deep-purple] p-3 sm:p-16">
-        <div className="sm:container mx-auto sm:px-28">
-          <div className="flex flex-wrap justify-center bg-white shadow-xl rounded-lg py-16 px-12 relative z-10">
-            <div className="w-full text-center lg:w-8/12">
-              <p className="text-4xl text-center">
-                <span role="img" aria-label="love">
-                  😍
-                </span>
-              </p>
-              <h3 className="font-semibold text-3xl">
-                Join Our Platform Today!
-              </h3>
-              <p className=" text-lg mt-4 mb-4">
-                Ready to take your washing center to the next level? Sign up now and become part of our growing community of successful washing centers. Together, we can redefine the washing experience for your customers!
-              </p>
-              <Link to={'../auth/sign-up'}>
-                <Button type="button" size={"lg"}>
-                  Start Your Washing Center
-                </Button>
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      <JoinNowCTA />
       <Footer />
       </>
   )
