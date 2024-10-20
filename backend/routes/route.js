@@ -4,8 +4,14 @@ import centerController from '../controller/center.js';
 import serviceController from '../controller/service.js';
 import bookingController from '../controller/booking.js';
 
+// Super Admin Controllers
+import usersController from '../controller/admin/users.js';
+import adminCenterController from '../controller/admin/center.js';
+import adminServiceController from '../controller/admin/service.js'
+import adminVehicleController from '../controller/admin/vehicle.js';
+import adminCategoryController from '../controller/admin/category.js'
+import adminDashboardController from '../controller/admin/dashboard.js'
 
-import memberController from '../controller/member.js';
 
 import { isAuth } from "../middleware/isAuthenticated.js";
 
@@ -42,20 +48,28 @@ router.route('/public/service/booking/:bookingID').get(bookingController.getPubl
 
 
 
+// Super Admin Controller
+router.route('/sa/auth/register/:isMaster?').post(authController.postMasterUserRegister).put(isAuth, authController.putValidateOTP).get(isAuth, authController.getResendOTP)
+router.route('/sa/auth/login').post(authController.postLogin).get(isAuth, authController.getMasterUserContext);
+router.route('/sa/auth/logout').get(isAuth, authController.getLogout);
+router.route('/sa/auth/forgotPassowrd').post(authController.postForgotPassword).put(authController.putResetPassword);
+
+router.route('/sa/admin/dashboard').get(isAuth, adminDashboardController.getAdminDashboardData)
+
+router.route('/sa/admin/users/:userId?').get(isAuth, usersController.getUsersList).delete(isAuth, usersController.deleteUser)
+router.route('/sa/admin/center/:centerID?').get(isAuth, adminCenterController.getCenterList).post(isAuth, adminCenterController.postCenterListingStatus).put(isAuth, adminCenterController.putCenterStatus).delete(isAuth, adminCenterController.deleteCenter)
+
+router.route('/sa/admin/data/service').get(isAuth, adminServiceController.getServiceList).post(isAuth, adminServiceController.postService).put(isAuth, adminServiceController.putServiceDetail)
+router.route('/sa/admin/data/service/api').get(isAuth, adminServiceController.getAPIServiceForm)
+router.route('/sa/admin/data/service/:serviceID').get(isAuth, adminServiceController.getInitService).delete(isAuth, adminServiceController.deleteService)
+
+router.route('/sa/admin/data/vehicle').get(isAuth, adminVehicleController.getVehicleList).post(isAuth, adminVehicleController.postVehicle).put(isAuth, adminVehicleController.putVehicleDetail);
+router.route('/sa/admin/data/vehicle/:vehicleID').get(isAuth, adminVehicleController.getInitVehicle).delete(isAuth, adminVehicleController.deleteVehicle);
+
+router.route('/sa/admin/data/category').get(isAuth, adminCategoryController.getCategoryList).post(isAuth, adminCategoryController.postServiceCategory).put(isAuth, adminCategoryController.putServiceCategoryDetail);
+router.route('/sa/admin/data/category/:categoryID').get(isAuth, adminCategoryController.getInitServiceCategory).delete(isAuth, adminCategoryController.deleteServiceCategory);
 
 
-// Old Routes Begins here
-router.route('/admin/customer').post(isAuth, memberController.postMember).put(isAuth, memberController.putMemberDetail).get(isAuth, memberController.getMemberList);
-router.route('/admin/customer/:customerID').get(isAuth, memberController.getInitMember).put(isAuth, memberController.putMemberStatus).delete(isAuth, memberController.deleteMember);
-
-
-// Public Routes
-router.route('/public/auth/login').post(authController.postLogin);
-router.route('/public/auth/logout').get(isAuth, authController.getLogout);
-router.route('/public/auth/register').post(authController.postRegister);
-
-router.route('/public/auth/forgot-password').post(authController.postForgotPassword);
-router.route('/public/auth/password-update').post(authController.putResetPassword);
 
 
 router.use('/', async (req, res) => {

@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import jwt from 'jsonwebtoken';
 import CONSTANT from '../constant/constant.js';
 import User from '../modal/user.js';
+import AdminUser from '../modal/adminUser.js';
 
 dotenv.config();
 
@@ -22,7 +23,7 @@ export const isAuth = async (req, res, next) => {
             }
 
             // Check if the user is active
-            let userData = await User.findOne({ email: decoded.email });
+            let userData = decoded.isMaster ? await AdminUser.findOne({ email: decoded.email }) : await User.findOne({ email: decoded.email });
             if (!userData) {
                 return res.status(RouteCode.NOT_FOUND.statusCode).json({ message: RouteCode.NOT_FOUND.message });
             }

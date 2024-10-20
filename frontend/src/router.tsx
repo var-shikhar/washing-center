@@ -59,7 +59,7 @@ const authRoutes = [
   {
     path: '/auth/sign-up',
     lazy: async () => ({
-      Component: (await import('./pages/auth/sign-up')).default,
+      Component: (await import('./pages/auth/sign-up.tsx')).default,
     }),
   },
   {

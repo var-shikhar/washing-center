@@ -5,10 +5,11 @@ import CONSTANT from '../constant/constant.js';
 import MAILER from '../helper/nodemailer.js';
 import OTP from "../modal/otp.js";
 import User from "../modal/user.js";
+import AdminUser from "../modal/adminUser.js";
 
 dotenv.config();
 const { RouteCode } = CONSTANT;
-const { JWT_SECRET_KEY, SALT, FRONTEND_URL } = process.env;
+const { JWT_SECRET_KEY, SALT, FRONTEND_URL, MASTER_FRONTEND_URL } = process.env;
 
 
 export async function generateOTP(userID) {
@@ -101,7 +102,49 @@ const postRegister = async (req, res) => {
         await MAILER.handleAccountOTPValidation(name, email, sharedOTP);
         await newUser.save();
 
-        const jwtToken = jwt.sign({ email: email }, JWT_SECRET_KEY, { expiresIn: '1d' });
+        const jwtToken = jwt.sign({ email: email, isMaster: false }, JWT_SECRET_KEY, { expiresIn: '1d' });
+        res.cookie('tkn', jwtToken, { secure: true, httpOnly: true, sameSite: 'None'});
+        return res.status(RouteCode.SUCCESS.statusCode).json(newUser._id);
+    } catch (err) {
+        console.error(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({ message: RouteCode.SERVER_ERROR.message })
+    }
+
+};
+const postMasterUserRegister = async (req, res) => {
+    const { name, email, phone, password, confirmPassword } = req.body;
+    try {
+        let hasEmail = await AdminUser.findOne({ email: email });
+        if (hasEmail) {
+            return res.status(RouteCode.CONFLICT.statusCode).json({message: 'Email already exists!' });
+        }
+
+        let hasPhone = await AdminUser.findOne({ phone: phone });
+        if (hasPhone) {
+            return res.status(RouteCode.CONFLICT.statusCode).json({message: 'Phone already exists!' });
+        }
+
+        if(password !== confirmPassword){
+            return res.status(RouteCode.CONFLICT.statusCode).json({message: 'Password does not match!' });
+        }
+
+        const hashedPassword = await bcrypt.hash(password.toString(), Number(SALT));
+        
+        const newUser = new AdminUser({
+            name: name,
+            email: email,
+            phone: phone,
+            password: hashedPassword,
+            userRole: "Manager",
+            isActive: true,
+            isEmailVerified: false,
+        })
+
+        const sharedOTP = await generateOTP(newUser._id);
+        await MAILER.handleAccountOTPValidation(name, email, sharedOTP);
+        await newUser.save();
+
+        const jwtToken = jwt.sign({ email: email, isMaster: true }, JWT_SECRET_KEY, { expiresIn: '1d' });
         res.cookie('tkn', jwtToken, { secure: true, httpOnly: true, sameSite: 'None'});
         return res.status(RouteCode.SUCCESS.statusCode).json(newUser._id);
     } catch (err) {
@@ -112,9 +155,9 @@ const postRegister = async (req, res) => {
 };
 const putValidateOTP = async (req, res) => {
     const userID = req.user;
-    const { otp } = req.body;
+    const { otp, isMaster = false } = req.body;
     try {
-        let foundUser = await User.findById(userID);
+        let foundUser = isMaster ? await AdminUser.findOne({ email: email }) : await User.findById(userID);
         if (!foundUser) {
             return res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'User not found, Try again!' });
         }
@@ -138,11 +181,10 @@ const putValidateOTP = async (req, res) => {
 };
 const getResendOTP = async (req, res) => {
     const userID = req.user;
+    const { isMaster = false } = req.params; 
     try {
-        let foundUser = await User.findById(userID);
-        if (!foundUser) {
-            return res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'User not found, Try again!' });
-        }
+        let foundUser = isMaster ? await AdminUser.findOne({ email: email }) : await User.findById(userID);
+        if (!foundUser) return res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'User not found, Try again!' });
 
         const sharedOTP = await generateOTP(userID);
         await MAILER.handleAccountOTPValidation(foundUser.name, foundUser.email, sharedOTP);
@@ -153,9 +195,9 @@ const getResendOTP = async (req, res) => {
     }
 };
 const postLogin = async (req, res) => {
-    const { email, password } = req.body;
+    const { email, password, isMaster = false } = req.body;
     try {
-        let validateUser = await User.findOne({ email: email });
+        let validateUser = isMaster ? await AdminUser.findOne({ email: email }) : await User.findOne({ email: email });
         if (!validateUser) {
             return res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'Account not found, Try creating a new one!' });
         }
@@ -166,9 +208,8 @@ const postLogin = async (req, res) => {
             return res.status(RouteCode.UNAUTHORIZED.statusCode).json({ message: 'Password is incorrect' });
         }
 
-        // Generate JWT token
-        const jwtToken = jwt.sign({ email: validateUser.email }, JWT_SECRET_KEY, { expiresIn: '1d' });
-        // Setting a cookie with domain and path options
+        // Generating and Setting a JWT token in cookie with domain and path options
+        const jwtToken = jwt.sign({ email: validateUser.email, isMaster: isMaster }, JWT_SECRET_KEY, { expiresIn: '1d' });
         res.cookie('tkn', jwtToken, { secure: true, httpOnly: true, sameSite: 'None'});
         return res.status(RouteCode.SUCCESS.statusCode).json(validateUser._id);
     } catch (err) {
@@ -193,16 +234,17 @@ const getLogout = async (req, res) => {
     }
 };
 const postForgotPassword = async (req, res) => {
-    const { email } = req.body;
+    const { email, isMaster = false } = req.body;
     try {
-      const user = await User.findOne({ email: email });
+      const user = isMaster ? await AdminUser.findOne({ email: email }) : await User.findOne({ email: email });
       if (!user) {
         return res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'User with this email does not exist.'});
       }
   
       // Create a reset token (expires in 15 minutes)
       const token = jwt.sign({ userId: user._id }, JWT_SECRET_KEY, { expiresIn: '15m' });
-      const resetPasswordURL = `${FRONTEND_URL}/auth/reset-password?token=${token}`;
+      const tempURL = isMaster ? MASTER_FRONTEND_URL : FRONTEND_URL;
+      const resetPasswordURL = `${tempURL}/auth/reset-password?token=${token}`;
   
       await MAILER.handleResetPassword(user.name, user.email, resetPasswordURL);
       return res.status(RouteCode.SUCCESS.statusCode).json({message: 'Reset mail has shared to the registered email!'});
@@ -212,19 +254,14 @@ const postForgotPassword = async (req, res) => {
     }
 };
 const putResetPassword = async (req, res) => {
-    const { token, password, confirmPassword } = req.body;
+    const { token, password, confirmPassword, isMaster = false } = req.body;
     try {
       const decoded = jwt.verify(token, JWT_SECRET_KEY);
 
-      const user = await User.findById(decoded.userId);
-      if (!user) {
-        return res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'User not found, Try later!'});
-      }
-
-      if (password !== confirmPassword) {
-        return res.status(RouteCode.CONFLICT.statusCode).json({message: 'Password does not match!'});
-      }
-
+      const user = isMaster ? await AdminUser.findOne({ email: email }) : await User.findById(decoded.userId);
+      if (!user) res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'User not found, Try later!'});
+      
+      if (password !== confirmPassword) res.status(RouteCode.CONFLICT.statusCode).json({message: 'Password does not match!'});
   
       user.password = await bcrypt.hash(password.toString(), Number(SALT));
       await user.save();
@@ -264,10 +301,35 @@ const getUserContext = async (req, res) => {
         res.status(RouteCode.SERVER_ERROR.statusCode).json({message: 'Invalid or expired token'});
     }
 };
+const getMasterUserContext = async (req, res) => {
+    const userID = req.user;
+    try {
+        const user = await AdminUser.findById(userID);
+        if (!user) {
+            return res.status(RouteCode.NOT_FOUND.statusCode).json({message: 'User not found, Try later!'});
+        }
+
+        const userContext = {
+            userID: user._id,
+            userName: user.name,
+            userEmail: user.email,
+            userPhone: user.phone,
+            userRole: user.userRole,
+            isActive: user.isActive,
+            isEmailVerified: user.isEmailVerified,
+        }
+
+        return res.status(RouteCode.SUCCESS.statusCode).json(userContext);
+    } catch (err) {
+        console.log(err);
+        res.status(RouteCode.SERVER_ERROR.statusCode).json({message: 'Invalid or expired token'});
+    }
+};
 
 export default {
     postRegister, putValidateOTP, getResendOTP,
     postLogin, getLogout,
     postForgotPassword, putResetPassword,
-    getUserContext
+    postMasterUserRegister,
+    getUserContext, getMasterUserContext
 }

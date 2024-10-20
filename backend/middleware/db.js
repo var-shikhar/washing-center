@@ -7,6 +7,7 @@ import Month from '../modal/month.js';
 import Vehicle from '../modal/vehicle.js';
 import ServiceCategory from '../modal/serviceCategory.js';
 import ServiceItem from '../modal/serviceItem.js';
+import AdminUser from '../modal/adminUser.js';
 
 dotenv.config();
 const { MONGO_URI, SALT } = process.env;
@@ -16,12 +17,29 @@ const connectDB = async () => {
     try {
         await mongoose.connect(MONGO_URI);
 
+        const adminUserCount = await AdminUser.countDocuments();
         const userCount = await User.countDocuments();
         const monthCount = await Month.countDocuments();
         const vehicleCount = await Vehicle.countDocuments();
         const categoryCount = await ServiceCategory.countDocuments();
         const serviceItemCount = await ServiceItem.countDocuments();
 
+        if (adminUserCount === 0) {
+            const hashedPassword = await bcrypt.hash('Admin@123', Number(SALT));
+            let adminUser = new AdminUser({
+                name: 'UTS Admin',
+                email: 'unnattechnologyservices@gmail.com',
+                phone: 9818059661,
+                password: hashedPassword,
+                userRole: 'Super-Admin',
+                isActive: true, 
+                isEmailVerified: true,
+            });
+
+            await adminUser.save();
+            console.log('Default user created');
+        }    
+        
         if (userCount === 0) {
             const hashedPassword = await bcrypt.hash('Admin@123', Number(SALT));
             let user = new User({
@@ -36,7 +54,7 @@ const connectDB = async () => {
 
             await user.save();
             console.log('Default user created');
-        }     
+        }    
         
         if(monthCount === 0){
             await Month.insertMany(MONTH_LIST);

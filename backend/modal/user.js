@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import Center from './washingCenter.js';
+import Booking from './booking.js';
 
 const UserSchema = new mongoose.Schema({
     name: {
@@ -52,6 +54,23 @@ const UserSchema = new mongoose.Schema({
         default: 'Client'
     }
 }, { timestamps: true });
+
+UserSchema.pre('deleteOne', { document: true, query: false }, async function(next) {
+    try {
+        const userId = this._id;
+        const centers = await Center.find({ ownerID: userId });
+
+        for (const center of centers) {
+            await Booking.deleteMany({ centerID: center._id });
+        }
+
+        await Center.deleteMany({ ownerID: userId });
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 
 const User = mongoose.model('User', UserSchema);
 export default User;

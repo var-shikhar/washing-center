@@ -490,8 +490,8 @@ const getPublicCenterList = async (req, res) => {
 
     try {
         const foundCenters = (parsedLat === 0 || parsedLong === 0 || parsedRadius === 0)
-            ? await Center.find({isActive: true, isLive: true}).populate() 
-            : await Center.find({isActive: true, isLive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], parsedRadius / 6378.1] }}}).populate();
+            ? await Center.find({isActive: true}).populate() 
+            : await Center.find({isActive: true, coordinates: { $geoWithin: { $centerSphere: [[parsedLong, parsedLat], parsedRadius / 6378.1] }}}).populate();
 
         const vehicleList = await Vehicle.find();  
         const categoryList = await ServiceCategory.find(); 
