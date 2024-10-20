@@ -28,7 +28,7 @@ export const io = new Server(server, {
 connectDB();
 
 app.use(cors({
-    origin: [FRONTEND_URL, 'http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:3000', 'http://localhost:3001', 'http://127.0.0.1:3001', 'https://washing-center.onrender.com'],
+    origin: [FRONTEND_URL, 'https://admin-washing-center.onrender.com', 'http://localhost:5173', 'http://localhost:5174', 'http://127.0.0.1:3000', 'http://localhost:3001', 'http://127.0.0.1:3001', 'https://washing-center.onrender.com'],
     methods: 'GET, POST, PUT, DELETE',
     allowedHeaders: 'Content-Type, Authorization, x-auth-token',
     credentials: true

@@ -34,10 +34,10 @@ export default function SelectedCenter({handleRemove, handleSelect, list, value}
             <SelectTrigger className="w-[100%]">
                 <SelectValue placeholder="Change Center" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-white">
                 <SelectGroup>
                 {list?.map(option => (
-                    <SelectItem key={option.centerID} value={option.centerID}>{option.centerName}</SelectItem>
+                    <SelectItem key={option.centerID} value={option.centerID} className="cursor-pointer">{option.centerName}</SelectItem>
                 ))}
                 <SelectItem value={'delete'}>Remove Center</SelectItem>
                 </SelectGroup>

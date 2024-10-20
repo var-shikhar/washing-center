@@ -31,26 +31,26 @@ const Header = ({activeHeader, wrapperClass = ''}: THeaderProps) => {
                 </div>
                 <div className="hidden md:flex space-x-4">
                     <Link to={'../about'}>
-                        <Button type="button" variant={'link'} className={`px-3 py-2 block my-auto text-lg rounded-md font-semibold font-sans ${activeHeader === 'About' ? 'text-white border-b-2 border-indigo-500' : sticky ? 'text-slate-500 hover:text-slate-900' : 'text-gray-400 hover:text-white'}`}>
+                        <div className={`px-3 py-2 block my-auto text-lg rounded-md font-semibold font-sans ${activeHeader === 'About' ? 'text-white border-b-2 border-black-500' : sticky ? 'text-slate-600 hover:text-slate-900' : 'text-gray-100 hover:text-white'}`}>
                             About Us
-                        </Button>
+                        </div>
                     </Link>
                     <ThemeSwitch />
                     <div className="hidden lg:flex items-center space-x-4">
                         {isLoggedIn ? 
                             <Link to={`../${userData?.userRole === 'Admin' ? 'bookings' : 'dashboard'}`}>
-                                <Button type="button" className="bg-indigo-700 text-white px-6 py-3 font-semibold font-sans hover:bg-indigo-600 hover:shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1" size={"lg"}>
+                                <Button type="button" variant={'default'} className="transition duration-300 ease-in-out transform hover:-translate-y-1" size={"lg"}>
                                     Manage Bookings
                                 </Button>
                             </Link> : 
                         (<>
                             <Link to={'../auth/sign-in'}>
-                                <Button type="button" className="bg-indigo-700 text-white px-6 py-3 font-semibold font-sans hover:bg-indigo-600 hover:shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1" size={"lg"}>
+                                <Button type="button" variant={'default'} className="transition duration-300 ease-in-out transform hover:-translate-y-1" size={"lg"}>
                                     Book your service
                                 </Button>
                             </Link>
                             <Link to={'../auth/sign-up'}>
-                                <Button type="button" className="bg-green-700 text-white px-6 py-3 font-semibold font-sans hover:bg-green-600 hover:shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1" size={"lg"}>
+                                <Button type="button" variant={'success'} className="hover:shadow-lg transition duration-300 ease-in-out transform hover:-translate-y-1" size={"lg"}>
                                     Start Your Washing Center
                                 </Button>
                             </Link> 

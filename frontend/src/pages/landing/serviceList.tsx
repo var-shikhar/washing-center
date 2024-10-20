@@ -25,9 +25,9 @@ const PublicServiceList = () => {
             <div className='my-1'>
                 {dialogData.isCustomizable && <div className='bg-red-100 text-red-700 rounded p-2 my-4'>Addons are customizable while booking.</div>}
                 <div className='text-muted-foreground mb-3'>{dialogData.serviceDescription}</div>
-                <hr className='border-[--background]' />
+                <hr className='border-[--muted]' />
                 <div className='font-semibold'>Service Price</div>
-                <hr className='border-[--background] mb-2' />
+                <hr className='border-[--muted] mb-2' />
                 <div className='flex gap-1 flex-col'>
                     <div className='flex justify-between items-center'>
                         <div className='text-muted-foreground'>Base Price</div>
@@ -44,7 +44,7 @@ const PublicServiceList = () => {
                         </div>
                     ))}                    
                 </div>
-                <hr className='border-[--background] my-2' />
+                <hr className='border-[--muted] my-2' />
                 <div className='flex justify-between items-center text-lg font-bold'>
                     <div className=''>Total Price</div>
                     <div className='font-semibold text-green-500'>

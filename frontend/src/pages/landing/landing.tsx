@@ -1,15 +1,9 @@
-import { Button } from "@/components/custom/button";
-import { Link } from "react-router-dom";
-import Header from "./component/header";
 import PublicCenterList from "@/components/centerList";
 import Footer from "./component/footer";
-import { useTheme } from "@/context/theme-provider";
+import Header from "./component/header";
 import JoinNowCTA from "./component/joinNowCTA";
 
 const LandingPage = () => {
-  const { theme } = useTheme();
-
-  console.log(theme)
   return (
     <>
       <Header activeHeader="Home" />

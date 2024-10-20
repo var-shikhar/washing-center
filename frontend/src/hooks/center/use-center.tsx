@@ -11,6 +11,7 @@ type TCenterList = {
     centerPhone: string;
     centerAddress: string;
     centerIsActive: boolean;
+    centerIsLive: boolean;
     services: TService
 }
 

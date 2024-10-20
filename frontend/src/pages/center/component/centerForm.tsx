@@ -50,7 +50,7 @@ export default function CenterRegistrationForm({ className, formID, handleConfir
   }
 
   return (
-    <div className={cn('grid gap-6', className)} {...props}>
+    <div className={cn(' grid gap-6', className)} {...props}>
       {currentPhase === 0 ? (
         <div>
           {!loading && <GoogleMapManualSelection locationDetail={defaultValues} setLocationDetail={setLocationDetail} showAddress={true} mapClass={'h-[300px]'} />}

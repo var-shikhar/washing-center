@@ -1,7 +1,7 @@
 import { Button } from '@/components/custom/button'
+import CustomDialog from '@/components/custom/customDialog'
 import CustomTooltip from '@/components/custom/customTooltip'
 import ThemeSwitch from '@/components/theme-switch'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -34,8 +34,6 @@ export default function CenterPanel() {
     setModalToggle(true);
     setModalData({id: id, title: title});
   }
-
-  // console.log(filteredList)
 
   return (
     <Layout fixed>
@@ -87,14 +85,11 @@ export default function CenterPanel() {
               </SelectContent>
             </Select>
           </div>
-          <Dialog open={modalToggle} onOpenChange={setModalToggle}>
-            <DialogTrigger asChild>
-              <Button type='button' onClick={() => handleCenterForm('', 'Add New Center')}>Add New Center</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[50vw]">
-              <DialogHeader>
-                <DialogTitle>{modalData.title}</DialogTitle>
-              </DialogHeader> 
+          <CustomDialog 
+            isOpen={modalToggle}
+            setISOpen={setModalToggle}
+            title={modalData.title}
+            contentNode={
               <CenterRegistrationForm 
                 formID={modalData.id} 
                 handleConfirmation={() => {
@@ -102,19 +97,23 @@ export default function CenterPanel() {
                   setModalToggle(false)
                 }}
               />
-            </DialogContent>
-          </Dialog>
+            }
+            isPrevantEsc
+            isPreventOutsideClick 
+            hasTrigger
+            triggerNode={<Button type='button' onClick={() => handleCenterForm('', 'Add New Center')}>Add New Center</Button>}
+          />
         </div>
-        <Separator className='shadow' />
+        <Separator className='shadow bg-[--muted]' />
         <ul className='faded-bottom no-scrollbar grid gap-4 overflow-auto pb-16 pt-4 md:grid-cols-2 lg:grid-cols-3'>
           {filteredList.map((center) => (
             <li
               key={center.centerID}
               className='relative rounded-lg border p-4 hover:shadow-md'
             >
-              {!center.centerIsActive && <div className='absolute bg-red-500 text-white px-3 rounded-e-md top-0 left-0'>Activate Center</div>}
+              {!center.centerIsActive && <div className='absolute bg-red-500 text-white px-3 rounded-tl-md rounded-e-md top-0 left-0'>Activate Center</div>}
               <div className='my-2 mt-3 flex items-center justify-between'>
-                <div className={`flex size-10 items-center justify-center rounded-lg bg-muted p-2 font-bold`}>
+                <div className={`flex size-10 items-center justify-center rounded-lg bg-[--muted] p-2 font-bold`}>
                   {center?.centerAbbreviation}
                 </div>
                 <div className='flex gap-2'>
@@ -140,18 +139,21 @@ export default function CenterPanel() {
                   />
                 </div>
               </div>
-              <div>
+              <div className=''>
                 <h2 className='mb-1 font-semibold text-xl'>{center.centerName}</h2>
                 <p className='line-clamp-2 text-gray-900'>Phone: {center.centerPhone}</p>
                 <small className='line-clamp-2 text-gray-500'>{center.centerAddress}</small>
-                <Button 
-                  className='my-2 flex gap-2' 
-                  size={'sm'} 
-                  variant={'outline'} 
-                  onClick={() => handleCenterSelectionFunction(center.centerID)}
-                >
-                  <IconListDetails size={15} /> View Details
-                </Button>
+                {center.centerIsLive ? 
+                  <Button 
+                    className='my-2 flex gap-2' 
+                    size={'sm'} 
+                    variant={'default'} 
+                    onClick={() => handleCenterSelectionFunction(center.centerID)}
+                  >
+                    <IconListDetails size={15} /> View Details
+                  </Button>
+                  :<div className='text-red-500 mt-4 font-semibold bg-red-200 px-2 rounded'>Center is pending approval by admin!</div>
+                }
               </div>
             </li>
           ))}

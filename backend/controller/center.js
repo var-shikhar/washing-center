@@ -33,6 +33,7 @@ const getCenterList = async (req, res) => {
                     centerPhone: center.phone,
                     centerAddress: center.geoAddress,
                     centerIsActive: center.isActive,
+                    centerIsLive: center.isLive,
                     centerAbbreviation: getNameAbbreviation(center.name)
                 }
             })

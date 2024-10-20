@@ -17,14 +17,23 @@
     --popover: #ffffff;
     --popover-foreground: #3b1f0d;
 
-    --primary: #00959f; /* Primary color */
+    --primary: #00959F; /* Primary color */
     --primary-foreground: #f0faff;
 
-    --secondary: #cdeff1; /* Lightened version of #00959f */
+    --secondary: #cdeff1; /* Lightened version of #00959F */
     --secondary-foreground: #3b1f0d;
 
-    --muted: #cdeff1;
-    --muted-foreground: #6e7d86;
+    --dark: #000000;
+    --dark-muted: #000000c7;
+
+    --indigo: #3D186A;
+    --indigo-muted: #3d186acd;
+
+    --success: #00840f;
+    --success-muted: #00840fc6;
+
+    --muted: #a5a5a5;
+    --muted-foreground: hsl(0, 0%, 47%);
 
     --accent: #cdeff1;
     --accent-foreground: #3b1f0d;
@@ -34,11 +43,11 @@
 
     --border: #d9eef0;
     --input: #d9eef0;
-    --ring: #00959f;
+    --ring: #00959F;
 
     --radius: 0.5rem;
 
-    --deep-purple: #00959f;
+    --deep-purple: #00959F;
     --white: #ffffff;
   }
 
@@ -52,14 +61,14 @@
       --popover: #1a1f24;
       --popover-foreground: #f0faff;
 
-      --primary: #00959f;
+      --primary: #00959F;
       --primary-foreground: #f0faff;
 
-      --secondary: #336f73; /* Darkened version of #00959f */
+      --secondary: #336f73; /* Darkened version of #00959F */
       --secondary-foreground: #f0faff;
 
-      --muted: #336f73;
-      --muted-foreground: #a6b3b9;
+      --muted: #a5a5a5;
+      --muted-foreground: hsl(0, 0%, 47%);
 
       --accent: #336f73;
       --accent-foreground: #f0faff;
@@ -69,9 +78,9 @@
 
       --border: #336f73;
       --input: #336f73;
-      --ring: #00959f;
+      --ring: #00959F;
 
-      --deep-purple: #00959f;
+      --deep-purple: #00959F;
       --white: #ffffff;
   }
 
@@ -167,7 +176,7 @@
 /* Waves Class */
 
 .header {
-  background: linear-gradient(60deg, #00959f 0%, #00659f 100%);
+  background: linear-gradient(60deg, #00959F 0%, #00659f 100%);
 }
 
 .waves {
@@ -220,3 +229,30 @@
   }
 }
 /* Till Here */
+
+
+/* Scroll Bar */
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 12px; /* Width of the scrollbar */
+}
+
+::-webkit-scrollbar-track {
+  background: var(--primary-foreground); /* Track color */
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--primary); /* Thumb color */
+  border-radius: 10px; /* Rounded corners */
+  border: 3px solid var(--primary-foreground); /* Adds padding around the thumb */
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+/* Firefox scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--primary-foreground);
+}

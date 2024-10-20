@@ -1,22 +1,22 @@
 import { Button } from '@/components/custom/button'
+import CustomDialog from '@/components/custom/customDialog'
 import ThemeSwitch from '@/components/theme-switch'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { UserNav } from '@/components/user-nav'
 import { Layout } from '@/context/layout'
 import useService from '@/hooks/service/use-service'
 import {
-    IconAdjustmentsHorizontal,
-    IconSortAscendingLetters,
-    IconSortDescendingLetters
+  IconAdjustmentsHorizontal,
+  IconSortAscendingLetters,
+  IconSortDescendingLetters
 } from '@tabler/icons-react'
 import ServiceForm from './component/serviceForm'
 import ServiceList from './component/serviceList'
@@ -79,14 +79,10 @@ export default function ServicePanel() {
               </SelectContent>
             </Select>
           </div>
-          <Dialog open={modalToggle} onOpenChange={setModalToggle}>
-            <DialogTrigger asChild>
-              <Button type='button' onClick={() => handleCenterForm('', 'Add New Service')}>Add New Service</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[50vw]">
-              <DialogHeader>
-                <DialogTitle>{modalData.title}</DialogTitle>
-              </DialogHeader> 
+          <CustomDialog
+            isOpen={modalToggle}
+            setISOpen={setModalToggle}
+            contentNode={
               <ServiceForm 
                 formID={modalData.id} 
                 handleConfirmation={() => {
@@ -94,8 +90,13 @@ export default function ServicePanel() {
                   setModalToggle(false)
                 }}
               />
-            </DialogContent>
-          </Dialog>
+            }
+            hasTrigger
+            title={modalData.title}
+            isPrevantEsc
+            isPreventOutsideClick
+            triggerNode={<Button type='button' onClick={() => handleCenterForm('', 'Add New Service')}>Add New Service</Button>}
+          />
         </div>
         <Separator className='shadow' />
         <ServiceList list={filteredList} handleDelete={handleServiceDeletion} handleUpdate={handleServiceStatusUpdate} handleEdit={handleCenterForm} />

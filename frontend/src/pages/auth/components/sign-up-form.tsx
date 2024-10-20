@@ -155,10 +155,10 @@ export function SignUpForm({ className, ...props }: SignUpFormProps) {
               Create Account
             </Button>
             <div className='relative my-2'>
-              <div className='absolute inset-0 flex items-center'>
+              <div className='absolute inset-0 flex items-center z-0'>
                 <span className='w-full border-t' />
               </div>
-              <div className='relative flex justify-center text-xs uppercase'>
+              <div className='relative flex justify-center text-xs uppercase w-max items-center z-10 bg-white m-auto'>
                 <span className='bg-background px-2 text-muted-foreground'>
                   Already have an account, &nbsp; <b className='fw-bold cursor-pointer underline underline-offset-4 hover:text-primary' onClick={() => navigate('../auth/sign-in')}>Login Here</b>
                 </span>

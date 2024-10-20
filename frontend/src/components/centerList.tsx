@@ -65,7 +65,7 @@ const PublicCenterList = () => {
               </Select>
             }
           </div>
-          <div className='mx-2'>
+          <div className='mx-2 w-full'>
             <div className="flex flex-wrap w-[90vw] sm:w-full mx-auto">
               {filteredList?.length >0 && filteredList.map(item => (
                 <div key={item.centerID} 
@@ -76,20 +76,20 @@ const PublicCenterList = () => {
                 onMouseLeave={() => setHoveredCard(null)}>
                   <div className='rounded-lg border p-4 hover:shadow-2xl hover:scale-105 transition-all delay-100 flex flex-col gap-2'> 
                     <div className='my-2 mt-3 flex items-center gap-2 w-full'>
-                      <div className={`flex size-10 items-center justify-center rounded-lg bg-muted p-2 font-bold`}>
+                      <div className={`flex size-10 items-center justify-center rounded-lg bg-[--muted] p-2 font-bold`}>
                         {item?.centerAbbreviation}
                       </div>
                       <h2 className='mb-1 font-semibold text-xl truncate'>{item?.centerName}</h2>
                     </div>
                     <p className='line-clamp-2'>
-                      <span className='text-muted-foreground'>Phone:</span>
+                      <span className='text-[--muted-foreground]'>Phone:</span>
                       &nbsp;{item?.centerPhone}
                     </p>
                     <p className='line-clamp-2'>
-                      <span className='text-muted-foreground'>Distance:</span>
+                      <span className='text-[--muted-foreground]'>Distance:</span>
                       &nbsp;{Number(item?.distance).toFixed(3)} km
                     </p>
-                    <small className='line-clamp-2 text-muted-foreground overflow-hidden text-ellipsis whitespace-normal' style={{minHeight: 'calc(2 * 1.2rem)'}}>{item?.centerAddress}</small>
+                    <small className='line-clamp-2 text-[--muted-foreground] overflow-hidden text-ellipsis whitespace-normal' style={{minHeight: 'calc(2 * 1.2rem)'}}>{item?.centerAddress}</small>
                     <div className='flex gap-2 justify-between'>
                       <Link to={`../center/${item.centerID}`}>
                         <Button type='button'  className='flex gap-2 items-center'>
@@ -97,7 +97,7 @@ const PublicCenterList = () => {
                           View Services
                         </Button>  
                       </Link>
-                      <Button type='button' className='flex gap-2 items-center' variant={'secondary'} onClick={() => handleGMapURL(item?.centerGeoLocation?.lat || 0, item?.centerGeoLocation?.long || 0)}>
+                      <Button type='button' className='flex gap-2 items-center' variant={'success'} onClick={() => handleGMapURL(item?.centerGeoLocation?.lat || 0, item?.centerGeoLocation?.long || 0)}>
                         <IconMap2 size={15} />
                         View Direction
                       </Button>

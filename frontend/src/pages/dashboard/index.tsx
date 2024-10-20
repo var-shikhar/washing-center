@@ -1,4 +1,3 @@
-import { Button } from '@/components/custom/button'
 import ThemeSwitch from '@/components/theme-switch'
 import { TopNav } from '@/components/top-nav'
 import {
@@ -11,8 +10,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { UserNav } from '@/components/user-nav'
 import { Layout } from '@/context/layout'
-import { RecentSales } from './components/recent-sales'
 import useAdminDashboard from '@/hooks/use-admin-dashboard'
+import { RecentSales } from './components/recent-sales'
 
 export default function Dashboard() {
   const { dashboardData } = useAdminDashboard();
