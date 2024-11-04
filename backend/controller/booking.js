@@ -173,17 +173,29 @@ const getPublicBookingList = async (req, res) => {
                 }
             })
             .populate({
+                path: 'centerID',
+                model: 'Center',
+                select: 'name phone coordinates'
+            })
+            .populate({
                 path: 'serviceAddons.addonID',
                 model: 'ServiceItem',
                 select: 'name'
                 })
             .sort({ createdAt: -1 });
 
+        console.log(foundBookings[0].centerID)
         const bookingList = (foundBookings || []).map(item => {
             return {
                 id: item._id,
                 clientName: item.userName || 'Unknown',
                 clientNumber: item.userPhone || 'N/A',
+                centerName: item.centerID.name || 'Unknown',
+                centerPhone: item.centerID.phone || 'N/A',
+                centerCoordinates: {
+                    lat: item.centerID.coordinates.coordinates[1] || 0,
+                    long: item.centerID.coordinates.coordinates[0] || 0
+                },
                 appointmentDate: item.bookingDate || 'Not specified',
                 appointmentTime: item.bookingTime || 'Not specified',
                 totalAmount: item.totalAmount || 0,
